@@ -1,6 +1,6 @@
 ---
 // BaseLayout.astro - Main base layout for all pages
-const { title = 'My Blog', description = '' } = Astro.props;
+const { title = 'Superposition', description = '' } = Astro.props;
 ---
 
 <html lang="en">
@@ -13,7 +13,7 @@ const { title = 'My Blog', description = '' } = Astro.props;
 		<meta name="viewport" content="width=device-width" />
 		<meta name="generator" content={Astro.generator} />
 		<meta name="description" content={description} />
-		<title>{title} | My Blog</title>
+		<title>{title} | Superposition</title>
 	</head>
 	<body>
 		<slot name="header" />

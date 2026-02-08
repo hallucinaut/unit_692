@@ -1,5 +1,5 @@
 ---
-title: 'Hello World: Welcome to My Blog'
+title: 'Hello World: Welcome to Superposition'
 date: '2026-02-01'
 author: 'John Doe'
 excerpt: 'This is my first blog post where I talk about getting started with Astro.'
