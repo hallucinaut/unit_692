@@ -24,6 +24,11 @@ main {
 
 footer {
 	margin-top: auto;
+	margin-top: 30px;
+	padding: 20px 0;
+	text-align: center;
+	border-top: 1px solid #ccc;
+}
 
 h1, h2, h3, h4 {
 	margin-bottom: 10px;
@@ -59,13 +64,6 @@ nav {
 }
 
 nav a { text-decoration: none; }
-
-footer {
-	margin-top: 30px;
-	padding: 20px 0;
-	text-align: center;
-	border-top: 1px solid #ccc;
-}
 
 time { font-size: 0.8rem; }
 
