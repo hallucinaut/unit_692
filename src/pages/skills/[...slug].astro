@@ -1,0 +1,102 @@
+---
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+	const skills = await getCollection('skills');
+	return skills.map((skill) => ({
+		params: { slug: skill.id },
+		props: { skill },
+	}));
+}
+
+const { skill } = Astro.props;
+const { Content } = await render(skill);
+---
+
+<BaseLayout title={skill.data.title} description={skill.data.description}>
+  <div class="grid-overlay"></div>
+
+	<article class="skill-detail wrapper">
+		<header class="skill-header">
+      <div class="meta-bar">
+        <span class="meta-item">TYPE: {skill.data.category.toUpperCase()}</span>
+        <span class="meta-item">LANG: {skill.data.language.toUpperCase()}</span>
+      </div>
+			<h1 class="skill-title">{skill.data.title}</h1>
+      <p class="skill-intro">{skill.data.description}</p>
+		</header>
+
+		<div class="skill-content-container">
+      <div class="content-header">
+        <span class="tab active">DIRECTIVE_TEXTUELLE</span>
+        <button class="copy-btn" id="copy-button">COPIER_DIRECTIVE</button>
+      </div>
+			<div class="skill-content" id="skill-text">
+				<Content />
+			</div>
+		</div>
+    <a href="/skills" class="back-link">[RETOUR_AUX_MODULES]</a>
+	</article>
+</BaseLayout>
+
+<script>
+  const copyBtn = document.getElementById('copy-button');
+  const content = document.getElementById('skill-text');
+
+  copyBtn?.addEventListener('click', async () => {
+    if (content) {
+      const text = content.innerText;
+      await navigator.clipboard.writeText(text);
+      
+      const originalText = copyBtn.innerText;
+      copyBtn.innerText = 'COPIÉ !';
+      copyBtn.classList.add('active');
+      
+      setTimeout(() => {
+        copyBtn.innerText = originalText;
+        copyBtn.classList.remove('active');
+      }, 2000);
+    }
+  });
+</script>
+
+<style>
+  /* ... styles existants ... */
+  .content-header {
+    background: var(--color-surface-3);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  .copy-btn {
+    background: transparent;
+    border: 1px solid var(--color-brand-1);
+    color: var(--color-brand-1);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.2rem 0.5rem;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  .copy-btn:hover, .copy-btn.active {
+    background: var(--color-brand-1);
+    color: #000000 !important;
+  }
+
+  @media (max-width: 600px) {
+    .content-header {
+      flex-direction: column;
+      gap: var(--space-s);
+      align-items: flex-start;
+    }
+    
+    .copy-btn {
+      width: 100%;
+      text-align: center;
+    }
+  }

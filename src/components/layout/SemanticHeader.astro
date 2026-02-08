@@ -1,0 +1,192 @@
+---
+const navItems = [
+  { href: '/', label: 'QG' },
+  { href: '/blog', label: 'JOURNAUX' },
+  { href: '/skills', label: 'SKILLS' },
+  { href: '/about', label: 'DONNÉES' },
+];
+
+const currentPath = Astro.url.pathname;
+---
+
+<header class="site-header">
+  <div class="wrapper header-inner">
+    <a href="/" class="logo" aria-label="Aller à l'accueil">
+      <span class="sys-prefix">[SYS]</span>
+      <span class="logo-unit">UNIT</span><span class="logo-number">_690</span>
+    </a>
+
+    <div class="header-right">
+      <nav aria-label="Navigation principale" class="main-nav">
+        <ul class="nav-list">
+          {navItems.map(({ href, label }) => {
+            const isActive = currentPath === href || (href !== '/' && currentPath.startsWith(href));
+            return (
+              <li>
+                <a href={href} class:list={['nav-link', { 'active': isActive }]} aria-current={isActive ? 'page' : undefined}>
+                  {label}
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+      <div class="status-indicator hover-blink">
+        <span class="status-dot blink-target"></span>
+        <span class="status-text">EN LIGNE</span>
+      </div>
+    </div>
+  </div>
+</header>
+
+<style>
+  .site-header {
+    padding-block: 0.75rem;
+    background-color: var(--color-surface-2);
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .header-inner {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: nowrap;
+  }
+
+  .logo {
+    font-family: var(--font-mono);
+    font-size: var(--step-0);
+    font-weight: 600;
+    text-decoration: none;
+    /* Suppression de la couleur globale pour laisser les spans s'exprimer */
+    border: none;
+    display: flex;
+    align-items: center;
+    gap: 0.2rem;
+    line-height: 1;
+    margin: 0;
+  }
+
+  .logo:hover {
+    background: transparent;
+    border: none;
+  }
+
+  /* Utilisation de sélecteurs plus spécifiques pour garantir l'affichage immédiat */
+  .logo .sys-prefix {
+    color: var(--color-text-dim) !important;
+    font-size: 0.75em;
+    font-weight: 400;
+    margin-right: 0.3rem;
+    border: none;
+  }
+
+  .logo .logo-unit {
+    color: var(--color-brand-1) !important;
+    font-weight: 700;
+    border: none;
+  }
+
+  .logo .logo-number {
+    color: var(--color-brand-2) !important;
+    font-weight: 700;
+    border: none;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-l);
+  }
+
+  .main-nav {
+    display: flex;
+    align-items: center;
+  }
+
+  .nav-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    gap: 0.25rem;
+    align-items: center;
+  }
+
+  .nav-list li {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    padding: 0;
+  }
+
+  .nav-link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    font-family: var(--font-mono);
+    font-weight: 500;
+    color: var(--color-text-2);
+    background: transparent;
+    height: 2rem;
+    padding-inline: 0.8rem;
+    border: 1px solid transparent;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.05em;
+    line-height: 1;
+  }
+
+  .nav-link:hover,
+  .nav-link.active {
+    color: #000000 !important;
+    background-color: var(--color-brand-1);
+    box-shadow: 0 0 10px var(--color-brand-1);
+    border-bottom: none !important;
+  }
+  
+  .status-indicator {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+    height: 1.8rem;
+    padding-inline: 0.6rem;
+    background: rgba(63, 185, 80, 0.1);
+    cursor: default;
+    line-height: 1;
+  }
+
+  .status-dot {
+    width: 8px;
+    height: 8px;
+    background-color: var(--color-success);
+    border-radius: 50%;
+  }
+
+  @media (max-width: 600px) {
+    .header-right {
+      width: 100%;
+      flex-direction: column;
+      align-items: stretch;
+      gap: var(--space-s);
+    }
+    
+    .nav-list {
+      justify-content: space-between;
+    }
+    
+    .status-indicator {
+      display: none;
+    }
+  }
+</style>

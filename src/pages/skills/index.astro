@@ -1,15 +1,12 @@
 ---
 import { getCollection } from 'astro:content';
-import BaseLayout from '../layouts/BaseLayout.astro';
-import BlogCard from '../components/ui/BlogCard.astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SkillCard from '../../components/ui/SkillCard.astro';
 
-// Get all blog posts sorted by date (newest first)
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
+const skills = await getCollection('skills');
 
-const title = 'Journaux Système';
-const description = 'Archive de toutes les transmissions système et mises à jour.';
+const title = 'Compétences Agent';
+const description = 'Modules et outils pour agents autonomes.';
 ---
 
 <BaseLayout title={title} description={description}>
@@ -17,17 +14,17 @@ const description = 'Archive de toutes les transmissions système et mises à jo
 
   <section class="archive-header wrapper">
     <h1 class="page-title">
-      <span class="prefix">>></span> JOURNAUX_SYSTÈME <span class="dim">//</span> ARCHIVE
+      <span class="prefix">>></span> COMPÉTENCES_AGENT <span class="dim">//</span> SKILLS
     </h1>
     <p class="page-desc">
-      [ACCÈS_BASE_DE_DONNÉES]... {posts.length} ENREGISTREMENTS TROUVÉS.
+      [CHARGEMENT_MODULES]... {skills.length} FONCTIONNALITÉS DISPONIBLES.
     </p>
   </section>
 
-	<section class="archive-grid wrapper">
+	<section class="skills-grid wrapper">
     <div class="grid-layout">
-  		{posts.map((post) => (
-  			<BlogCard post={post} />
+  		{skills.map((skill) => (
+  			<SkillCard skill={skill} />
   		))}
     </div>
 	</section>
@@ -57,20 +54,13 @@ const description = 'Archive de toutes les transmissions système et mises à jo
   }
 
   .page-title {
-    font-size: var(--step-3);
+    font-size: var(--step-4);
     font-family: var(--font-mono);
     color: var(--color-brand-1);
-    text-shadow: 0 0 10px rgba(88, 166, 255, 0.2);
   }
 
-  .prefix {
-    color: var(--color-accent);
-    margin-right: 0.5rem;
-  }
-  
-  .dim {
-    color: var(--color-text-dim);
-  }
+  .prefix { color: var(--color-accent); margin-right: 0.5rem; }
+  .dim { color: var(--color-text-dim); }
 
   .page-desc {
     font-family: var(--font-mono);
@@ -80,13 +70,10 @@ const description = 'Archive de toutes les transmissions système et mises à jo
     margin-top: var(--space-s);
   }
 
-  .archive-grid {
-    margin-bottom: var(--space-2xl);
-  }
-
   .grid-layout {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
     gap: var(--space-m);
+    margin-bottom: var(--space-2xl);
   }
 </style>

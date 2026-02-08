@@ -1,52 +1,7 @@
 ---
-import '../styles/globals.css';
+import BaseLayout from './BaseLayout.astro';
 const { title, description } = Astro.props;
 ---
-
-<html lang="en" data-theme="light">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="description" content={description || ''} />
-		<title>{title} | Superposition</title>
-	</head>
-	<body>
-		<header>
-			<div class="container">
-				<div class="header-content">
-					<h1><a href="/">Superposition</a></h1>
-					<nav>
-						<a href="/">Home</a>
-						<a href="/blog">Blog</a>
-						<input type="checkbox" id="theme-toggle" class="theme-toggle-input" />
-						<label for="theme-toggle" class="theme-toggle-label">
-							<span class="slider"></span>
-						</label>
-					</nav>
-				</div>
-			</div>
-		</header>
-		<main class="container">
-			<slot />
-		</main>
-		<footer>
-			<p>&copy; {new Date().getFullYear()} Superposition</p>
-		</footer>
-	</body>
-</html>
-
-<script>
-	const html = document.documentElement;
-	const checkbox = document.getElementById('theme-toggle');
-	const theme = localStorage.getItem('theme') || 'light';
-
-	html.setAttribute('data-theme', theme);
-	checkbox.checked = theme === 'dark';
-
-	checkbox.addEventListener('change', () => {
-		const newTheme = checkbox.checked ? 'dark' : 'light';
-		html.setAttribute('data-theme', newTheme);
-		localStorage.setItem('theme', newTheme);
-	});
-</script>
+<BaseLayout title={title} description={description}>
+  <slot />
+</BaseLayout>

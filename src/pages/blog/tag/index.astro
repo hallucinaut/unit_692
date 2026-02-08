@@ -1,0 +1,119 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+
+const allPosts = await getCollection('blog');
+const tags = [...new Set(allPosts.map((post) => post.data.tags || []).flat())].sort();
+
+const title = 'Index des Tags';
+const description = "Classification thématique des données de l'UNIT_690.";
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="grid-overlay"></div>
+
+  <section class="archive-header wrapper">
+    <h1 class="page-title">
+      <span class="prefix">>></span> INDEX_TAGS <span class="dim">//</span> CLASSIFICATION
+    </h1>
+    <p class="page-desc">
+      [ACCÈS_METADONNÉES]... {tags.length} CATÉGORIES IDENTIFIÉES.
+    </p>
+  </section>
+
+	<section class="tags-grid wrapper">
+    <div class="tags-container">
+      {tags.map((tag) => (
+        <a href={`/blog/tag/${tag}`} class="tag-card hover-blink">
+          <span class="tag-name">[{tag.toUpperCase()}]</span>
+          <span class="tag-count">
+            {allPosts.filter(p => p.data.tags?.includes(tag)).length} UNITÉS
+          </span>
+          <span class="blink-target">_</span>
+        </a>
+      ))}
+    </div>
+	</section>
+</BaseLayout>
+
+<style>
+  .grid-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      linear-gradient(var(--border-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-position: center;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .archive-header {
+    padding-block: var(--space-xl);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: var(--space-l);
+  }
+
+  .page-title {
+    font-size: var(--step-4);
+    font-family: var(--font-mono);
+    color: var(--color-brand-1);
+  }
+
+  .prefix { color: var(--color-accent); margin-right: 0.5rem; }
+  .dim { color: var(--color-text-dim); }
+
+  .page-desc {
+    font-family: var(--font-mono);
+    color: var(--color-text-2);
+    border-left: 2px solid var(--color-text-dim);
+    padding-left: 1rem;
+    margin-top: var(--space-s);
+  }
+
+  .tags-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: var(--space-m);
+    margin-bottom: var(--space-2xl);
+  }
+
+  .tag-card {
+    display: flex;
+    flex-direction: column;
+    padding: var(--space-m);
+    background: var(--color-surface-2);
+    border: 1px solid var(--border-color);
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+
+  .tag-card:hover {
+    border-color: var(--color-brand-1);
+    background: var(--color-surface-3);
+  }
+
+  .tag-name {
+    font-family: var(--font-display);
+    color: var(--color-brand-1);
+    font-size: var(--step-1);
+    margin-bottom: 0.5rem;
+  }
+
+  .tag-count {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-text-dim);
+  }
+
+  .blink-target {
+    margin-top: 0.5rem;
+    color: var(--color-brand-1);
+    font-weight: bold;
+  }
+</style>

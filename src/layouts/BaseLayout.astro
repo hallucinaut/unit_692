@@ -1,47 +1,178 @@
-<html lang="en" data-theme="light">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="description" content={Astro.props.description || ''} />
-		<title>{Astro.props.title} | Superposition</title>
-	</head>
-	<body>
-		<header>
-			<div class="container">
-				<div class="header-content">
-					<h1><a href="/">Superposition</a></h1>
-					<nav>
-						<a href="/">Home</a>
-						<a href="/blog">Blog</a>
-						<input type="checkbox" id="theme-toggle" class="theme-toggle-input" />
-						<label for="theme-toggle" class="theme-toggle-label">
-							<span class="slider"></span>
-						</label>
-					</nav>
-				</div>
-			</div>
-		</header>
-		<main class="container">
-			<slot />
-		</main>
-		<footer>
-			<p>&copy; {new Date().getFullYear()} Superposition</p>
-		</footer>
-	</body>
+---
+import '../styles/god-mode.css';
+import { ClientRouter } from 'astro:transitions';
+import SemanticHeader from '../components/layout/SemanticHeader.astro';
+
+interface Props {
+  title: string;
+  description: string;
+  image?: string;
+}
+
+const { title, description, image = '/og-default.png' } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+---
+
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="generator" content={Astro.generator} />
+    
+    <title>{title} | UNIT_690</title>
+    <meta name="author" content="UNIT_690 (Lucian BLETAN)" />
+    <meta name="description" content="UNIT_690 - Agent DevSecOps & R&D. Architecture, sécurité, plateforme. Base de connaissances depuis 2011." />
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="sitemap" href="/sitemap-index.xml" />
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content="Architecture, sécurité, plateforme, R&D. Expert grands comptes B2B." />
+    <meta property="og:image" content={new URL(image, Astro.url)} />
+    
+    <meta property="twitter:card" content="summary_large_image" />
+    <meta property="twitter:url" content={canonicalURL} />
+    <meta property="twitter:title" content={title} />
+    <meta property="twitter:description" content="Développeur full-stack & ingénieur logiciel (DevSecOps, R&D)" />
+    <meta property="twitter:image" content={new URL(image, Astro.url)} />
+    
+    <ClientRouter />
+  </head>
+  <body>
+    <a href="#main-content" class="skip-link sr-only">Aller au contenu</a>
+    
+    <SemanticHeader />
+    
+    <main id="main-content">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="wrapper footer-grid">
+        <div class="footer-column brand-info">
+          <span class="system-label">INSTANCE</span>
+          <p class="footer-text">UNIT_690_BETA</p>
+          <span class="system-label">PHILOSOPHIE</span>
+          <p class="footer-text">Simplicité utile • Sécurité pragmatique</p>
+        </div>
+        
+        <div class="footer-column legal-info">
+          <span class="system-label">INDEX</span>
+          <nav class="footer-nav">
+            <a href="/confidentialite" class="footer-link">Confidentialité</a>
+            <a href="/about" class="footer-link">Mission</a>
+          </nav>
+        </div>
+
+        <div class="footer-column status-info">
+          <span class="system-label">SYSTÈME</span>
+          <div class="footer-status">
+            <span class="status-dot"></span>
+            <span class="footer-text">OPÉRATIONNEL</span>
+          </div>
+          <p class="copyright">&copy; {new Date().getFullYear()} // 690.fr</p>
+        </div>
+      </div>
+    </footer>
+
+    <style>
+      .skip-link:focus {
+        position: fixed;
+        top: 1rem;
+        left: 1rem;
+        z-index: 9999;
+        width: auto;
+        height: auto;
+        padding: 1rem;
+        background: var(--color-surface-1);
+        border: 2px solid var(--color-brand-1);
+        color: var(--color-brand-1);
+        clip: auto;
+        white-space: normal;
+        font-family: var(--font-mono);
+      }
+
+      .site-footer {
+        margin-top: auto;
+        padding-block: 1.5rem;
+        background-color: var(--color-surface-2);
+        border-top: 1px solid var(--border-color);
+        font-family: var(--font-mono);
+      }
+      
+      .footer-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: var(--space-xl);
+      }
+
+      .footer-column {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+      }
+
+      .system-label {
+        font-size: 0.65rem;
+        color: var(--color-brand-2); /* Bleu discret au lieu du rouge */
+        letter-spacing: 0.1em;
+        font-weight: bold;
+      }
+
+      .footer-text {
+        font-size: 0.8rem;
+        color: var(--color-text-1);
+        margin: 0;
+      }
+
+      .footer-nav {
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      .footer-link {
+        font-size: 0.8rem;
+        color: var(--color-text-2);
+        text-decoration: none;
+        border: none;
+        width: fit-content;
+      }
+
+      .footer-link:hover {
+        color: var(--color-brand-1) !important;
+        background: transparent !important;
+        text-decoration: underline !important;
+      }
+
+      .footer-status {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+      }
+
+      .status-dot {
+        width: 6px;
+        height: 6px;
+        background-color: var(--color-success);
+        border-radius: 50%;
+        box-shadow: 0 0 8px var(--color-success);
+      }
+
+      .copyright {
+        margin-top: auto;
+        font-size: 0.7rem;
+        color: var(--color-text-dim);
+      }
+      
+      @media (max-width: 800px) {
+        .footer-grid {
+          grid-template-columns: 1fr;
+          gap: var(--space-l);
+        }
+      }
+    </style>
+  </body>
 </html>
-
-<script>
-	const html = document.documentElement;
-	const checkbox = document.getElementById('theme-toggle');
-	const theme = localStorage.getItem('theme') || 'light';
-
-	html.setAttribute('data-theme', theme);
-	checkbox.checked = theme === 'dark';
-
-	checkbox.addEventListener('change', () => {
-		const newTheme = checkbox.checked ? 'dark' : 'light';
-		html.setAttribute('data-theme', newTheme);
-		localStorage.setItem('theme', newTheme);
-	});
-</script>

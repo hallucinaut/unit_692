@@ -1,48 +1,111 @@
 ---
 import { getCollection } from 'astro:content';
-import BlogLayout from '../../../layouts/BlogLayout.astro';
-import { formatDate } from '../../../lib/date';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import BlogCard from '../../../components/ui/BlogCard.astro';
 
-// Get all tags for static generation
 export async function getStaticPaths() {
-	const posts = await getCollection('blog');
-	const tags = [...new Set(posts.flatMap((post) => post.data.tags || []))];
+  const allPosts = await getCollection('blog');
+  const uniqueTags = [...new Set(allPosts.map((post) => post.data.tags || []).flat())];
 
-	return tags.map((tag) => ({
-		params: { tag },
-		props: {},
-	}));
+  return uniqueTags.map((tag) => {
+    const filteredPosts = allPosts.filter((post) => post.data.tags?.includes(tag));
+    return {
+      params: { tag },
+      props: { posts: filteredPosts },
+    };
+  });
 }
 
-// Get posts filtered by tag
 const { tag } = Astro.params;
-const posts = (await getCollection('blog'))
-	.filter((post) => post.data.tags?.includes(tag))
-	.sort(
-		(a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-	);
+const { posts } = Astro.props;
 
-const title = `Posts tagged with "${tag}"`;
-const description = `Blog posts about ${tag}`;
+const sortedPosts = posts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+
+const title = `Tag: ${tag}`;
+const description = `Articles filtrés par le tag ${tag}.`;
 ---
 
-<BlogLayout title={title} description={description}>
-	<h1>Tagged with "{tag}"</h1>
+<BaseLayout title={title} description={description}>
+  <div class="grid-overlay"></div>
 
-	<section>
-		{posts.length > 0 ? (
-			posts.map((post) => (
-				<article>
-					<a href={`/blog/${post.slug}/`}>
-						<h2>{post.data.title}</h2>
-					</a>
-					<time datetime={post.data.date}>
-						{formatDate(post.data.date)}
-					</time>
-				</article>
-			))
-		) : (
-			<p>No posts found for this tag.</p>
-		)}
+  <section class="archive-header wrapper">
+    <h1 class="page-title">
+      <span class="prefix">>></span> FILTRE <span class="dim">//</span> TAG: {tag.toUpperCase()}
+    </h1>
+    <p class="page-desc">
+      [TRI_SÉLECTIF]... {posts.length} UNITÉS CORRESPONDANTES TROUVÉES.
+    </p>
+    <a href="/blog/tag" class="back-link">[RETOUR_A_L_INDEX]</a>
+  </section>
+
+	<section class="archive-grid wrapper">
+    <div class="grid-layout">
+  		{sortedPosts.map((post) => (
+  			<BlogCard post={post} />
+  		))}
+    </div>
 	</section>
-</BlogLayout>
+</BaseLayout>
+
+<style>
+  .grid-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      linear-gradient(var(--border-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-position: center;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .archive-header {
+    padding-block: var(--space-xl);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: var(--space-l);
+  }
+
+  .page-title {
+    font-size: var(--step-4);
+    font-family: var(--font-mono);
+    color: var(--color-brand-1);
+  }
+
+  .prefix { color: var(--color-accent); margin-right: 0.5rem; }
+  .dim { color: var(--color-text-dim); }
+
+  .page-desc {
+    font-family: var(--font-mono);
+    color: var(--color-text-2);
+    border-left: 2px solid var(--color-text-dim);
+    padding-left: 1rem;
+    margin-top: var(--space-s);
+    margin-bottom: var(--space-m);
+  }
+
+  .back-link {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-brand-1);
+    text-decoration: none;
+  }
+  
+  .back-link:hover {
+    text-decoration: underline;
+  }
+
+  .archive-grid {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .grid-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
+    gap: var(--space-m);
+  }
+</style>

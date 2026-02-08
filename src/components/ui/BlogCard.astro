@@ -1,0 +1,185 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  post: CollectionEntry<'blog'>;
+  loading?: "eager" | "lazy";
+}
+
+const { post } = Astro.props;
+// Extraction des données textuelles uniquement
+const { title, excerpt, date } = post.data;
+
+const formattedDate = date.toLocaleDateString('fr-FR', {
+  year: 'numeric',
+  month: '2-digit',
+  day: '2-digit',
+}).replace(/\//g, '.'); // Format DD.MM.YYYY
+---
+
+<article class="blog-card hover-blink">
+  <div class="card-decoration top-left"></div>
+  <div class="card-decoration bottom-right"></div>
+  
+  <div class="card-content">
+    <div class="meta-line">
+      <span class="indicator blink-target">></span>
+      <time datetime={date.toISOString()} class="card-date">[{formattedDate}]</time>
+    </div>
+    
+    <h3 class="card-title">
+      <a href={`/blog/${post.id}/`}>{title}</a>
+    </h3>
+    <p class="card-desc">{excerpt}</p>
+    
+    <div class="card-footer">
+      <a href={`/blog/${post.id}/`} class="read-more view-all">ACCÈS_DONNÉES__</a>
+    </div>
+  </div>
+</article>
+
+<style>
+  .blog-card {
+    container-type: inline-size;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: var(--color-surface-2);
+    border: 1px solid var(--border-color);
+    position: relative;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    height: 100%;
+  }
+
+  .blog-card:hover {
+    border-color: var(--color-brand-1);
+    box-shadow: 0 0 15px rgba(88, 166, 255, 0.1);
+    transform: translateY(-2px);
+  }
+
+  /* Décorations de coins */
+  .card-decoration {
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border: 2px solid transparent;
+    transition: all 0.3s ease;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .top-left {
+    top: -1px;
+    left: -1px;
+    border-top-color: var(--color-brand-1);
+    border-left-color: var(--color-brand-1);
+  }
+
+  .bottom-right {
+    bottom: -1px;
+    right: -1px;
+    border-bottom-color: var(--color-brand-1);
+    border-right-color: var(--color-brand-1);
+    opacity: 0.3;
+  }
+
+  .blog-card:hover .bottom-right {
+    opacity: 1;
+  }
+
+  .card-content {
+    padding: var(--space-m);
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+    position: relative;
+  }
+
+  .meta-line {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-bottom: var(--space-xs);
+    color: var(--color-brand-1);
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+  }
+
+  .indicator {
+    /* Styles are fine, animation handled by utility class */
+  }
+
+  .card-date {
+    color: var(--color-brand-1);
+  }
+
+  .card-title {
+    margin-block: var(--space-2xs);
+    font-size: var(--step-1);
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .card-title a {
+    text-decoration: none;
+    color: var(--color-text-1);
+    border: none;
+  }
+
+  .card-title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+  
+  .card-title a:hover {
+    color: var(--color-brand-1);
+    background: transparent;
+  }
+
+  .card-desc {
+    font-size: var(--step--1);
+    color: var(--color-text-2);
+    margin-block-end: var(--space-m);
+    line-height: 1.5;
+    font-family: var(--font-mono);
+    border-left: 2px solid var(--border-color);
+    padding-left: var(--space-s);
+  }
+  
+  .card-footer {
+    margin-top: auto;
+    border-top: 1px dashed var(--border-color);
+    padding-top: var(--space-s);
+    text-align: right;
+  }
+  
+  .read-more {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-brand-1);
+    opacity: 0.7;
+  }
+  
+  .blog-card:hover .read-more {
+    opacity: 1;
+    text-shadow: 0 0 5px var(--color-brand-1);
+  }
+
+  /* Container Query Magic */
+  @container (min-width: 600px) {
+    .blog-card {
+      flex-direction: row;
+      align-items: stretch;
+    }
+    
+    .card-media {
+      width: 45%;
+      height: auto;
+      aspect-ratio: auto;
+      border-bottom: none;
+      border-right: 1px solid var(--border-color);
+    }
+  }
+</style>

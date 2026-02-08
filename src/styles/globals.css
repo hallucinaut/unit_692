@@ -6,7 +6,7 @@
 /* 1. GLOBAL BOX SIZING & DEFAULTS
    -------------------------------------------------------------------------- */
 *, *::before, *::after {
-  box-sizing: border-box; /* The holy grail of layout sanity */
+  box-sizing: border-box;
 }
 
 /* 2. ROOT CONFIGURATION
@@ -14,24 +14,23 @@
 :root {
   -moz-tab-size: 4;
   tab-size: 4;
-  /* Allows browsers to use native UI (dark/light) adjustments */
   color-scheme: light dark;
 }
 
 /* 3. HTML & BODY SETUP
    -------------------------------------------------------------------------- */
 html {
-  line-height: 1.5; /* Standard readable line-height */
-  -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape on iOS */
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
 }
 
 body {
-  margin: 0; /* Remove default browser margin */
-  min-height: 100vh; /* Ensure body always fills the viewport */
+  margin: 0;
+  min-height: 100vh;
   line-height: inherit;
-  text-rendering: optimizeLegibility; /* Improve font kerning/ligatures */
-  -webkit-font-smoothing: antialiased; /* Crisper text on macOS */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   display: flex;
   flex-direction: column;
@@ -47,68 +46,63 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 p, h1, h2, h3, h4, h5, h6 {
-  overflow-wrap: break-word; /* Prevent long words from breaking layouts */
+  overflow-wrap: break-word;
 }
 
-/* Fix 'sub' and 'sup' affecting line-height */
 sub, sup {
   font-size: 0.75em;
   line-height: 0;
   position: relative;
   vertical-align: baseline;
 }
+
 sub { bottom: -0.25em; }
 sup { top: -0.5em; }
 
-/* Inherit decoration for consistency */
 a {
   color: inherit;
   text-decoration: inherit;
-  text-decoration-skip-ink: auto; /* Better underlining */
+  text-decoration-skip-ink: auto;
 }
 
-/* Preformatted text should wrap to prevent overflow */
 pre {
   white-space: pre-wrap;
 }
 
 /* 5. LISTS
    -------------------------------------------------------------------------- */
-/* Remove list styles on ul/ol with a class attribute (assumed to be a component) */
 ul[class], ol[class] {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-/* Standardize generic lists */
+
 ul, ol, dd {
   margin-top: 0;
   margin-bottom: 0;
 }
 
-/* 6. MEDIA (IMAGES, VIDEO, SVG)
+/* 6. MEDIA
    -------------------------------------------------------------------------- */
 img, picture, video, canvas, svg, iframe, object {
-  display: block; /* Removes the bottom gap in inline elements */
-  max-width: 100%; /* Prevents overflow */
+  display: block;
+  max-width: 100%;
 }
 
 img {
-  height: auto; /* Maintains aspect ratio */
-  font-style: italic; /* Style the alt text if image is broken */
+  height: auto;
+  font-style: italic;
   background-repeat: no-repeat;
   background-size: cover;
   shape-margin: 0.75rem;
 }
 
-/* SVG specific */
 svg {
-  fill: currentColor; /* Makes icons inherit text color */
+  fill: currentColor;
 }
 
-/* 7. FORMS & INTERACTIVE ELEMENTS (The Tricky Part)
+/* 7. FORMS & INTERACTIVE ELEMENTS
    -------------------------------------------------------------------------- */
-/* Reset fonts for all form elements */
 input, button, textarea, select, optgroup {
   font-family: inherit;
   font-size: 100%;
@@ -117,12 +111,10 @@ input, button, textarea, select, optgroup {
   color: inherit;
 }
 
-/* Normalize buttons */
 button, select {
   text-transform: none;
 }
 
-/* Ensure buttons and inputs are clickable */
 button, [type="button"], [type="reset"], [type="submit"] {
   -webkit-appearance: button;
   appearance: button;
@@ -131,29 +123,25 @@ button, [type="button"], [type="reset"], [type="submit"] {
   border-style: solid;
 }
 
-/* Fix Firefox focus ring */
 ::-moz-focus-inner {
   border-style: none;
   padding: 0;
 }
 
-/* Restore focus styles if they were unset */
 :-moz-focusring {
   outline: 1px dotted ButtonText;
 }
 
-/* Textarea standardization */
 textarea {
-  resize: vertical; /* Prevent horizontal resizing breaking layout */
+  resize: vertical;
   display: block;
 }
 
-/* Fieldset reset */
 fieldset {
   padding: 0;
   margin: 0;
   border: 0;
-  min-width: 0; /* Fix flexbox overflow issues */
+  min-width: 0;
 }
 
 legend {
@@ -166,7 +154,7 @@ legend {
 /* 8. TABLES
    -------------------------------------------------------------------------- */
 table {
-  border-collapse: collapse; /* Merges borders */
+  border-collapse: collapse;
   border-spacing: 0;
   width: 100%;
   text-indent: 0;
@@ -175,17 +163,14 @@ table {
 
 /* 9. HTML5 NEW ELEMENTS & UTILITIES
    -------------------------------------------------------------------------- */
-/* Standardize the HTML5 dialog */
 dialog {
   padding: 0;
 }
 
-/* Add support for the hidden attribute */
 [hidden] {
   display: none !important;
 }
 
-/* Summary/Details pointer */
 summary {
   display: list-item;
   cursor: pointer;
@@ -269,6 +254,7 @@ time { font-size: 0.8rem; }
 .content h2 { margin-top: 20px; }
 .content h3 { margin-top: 15px; }
 .content ul, .content ol { margin-bottom: 10px; padding-left: 2rem; }
+
 .content code {
   font-family: monospace;
   background: #f0f0f0;
@@ -300,351 +286,6 @@ time { font-size: 0.8rem; }
 
 /* Theme Variables */
 [data-theme="dark"] {
-  --bg: #000;
-  --text: #fff;
-  --border: #333;
-  --container-bg: #0a0a0a;
-}
-
-[data-theme="light"] {
-  --bg: #fff;
-  --text: #000;
-  --border: #ccc;
-  --container-bg: #fff;
-}
-
-/* Theme Button */
-.theme-toggle {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 5px 15px;
-  cursor: pointer;
-  margin-left: 15px;
-  font-size: 0.875rem;
-}
-
-[data-theme="dark"] body,
-[data-theme="dark"] h1,
-[data-theme="dark"] h2,
-[data-theme="dark"] h3,
-[data-theme="dark"] h4,
-[data-theme="dark"] p,
-[data-theme="dark"] a,
-[data-theme="dark"] time {
-  background: var(--bg);
-  color: var(--text);
-}
-
-[data-theme="dark"] article,
-[data-theme="dark"] .content {
-  border-color: var(--border);
-}
-
-[data-theme="dark"] .content code {
-  background: #222;
-  color: #e0e0e0;
-}
-
-[data-theme="dark"] .content pre {
-  background: #222;
-}
-
-[data-theme="dark"] .tags a {
-  background: #222;
-  color: var(--text);
-}
-
-[data-theme="dark"] footer {
-  border-color: var(--border);
-}
-
-[data-theme="light"] body,
-[data-theme="light"] h1,
-[data-theme="light"] h2,
-[data-theme="light"] h3,
-[data-theme="light"] h4,
-[data-theme="light"] p,
-[data-theme="light"] a,
-[data-theme="light"] time {
-  background: var(--bg);
-  color: var(--text);
-}
-
-[data-theme="light"] article,
-[data-theme="light"] .content {
-  border-color: var(--border);
-}
-
-[data-theme="light"] .content code {
-  background: #f0f0f0;
-  color: #000;
-}
-
-[data-theme="light"] .content pre {
-  background: #f0f0f0;
-}
-
-[data-theme="light"] .tags a {
-  background: #e0e0e0;
-  color: #000;
-}
-
-[data-theme="light"] footer {
-  border-color: var(--border);
-}
-
-/* Header Layout */
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-nav {
-  display: flex;
-  gap: 15px;
-  align-items: center;
-}
-
-@media (max-width: 600px) {
-  .header-content {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  nav {
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-  }
-
-  nav a,
-  .theme-toggle {
-    width: 100%;
-    text-align: center;
-  }
-}
-
-/* Header Layout */
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
-}
-
-nav {
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
-}
-
-.theme-toggle {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 8px 12px;
-  cursor: pointer;
-  font-size: 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin: 0;
-}
-
-@media (max-width: 600px) {
-  .header-content {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  nav {
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-  }
-
-  nav a,
-  .theme-toggle {
-    width: 100%;
-    text-align: center;
-  }
-}
-
-/* Theme Variables */
-[data-theme="dark"] {
-  --bg: #050505;
-  --card: #0f0f0f;
-  --fg: #ffffff;
-  --dim: #525252;
-  --border: rgba(255, 255, 255, 0.08);
-  --shadow-color: #000;
-  --accent-glow: rgba(255, 255, 255, 0.2);
-}
-
-[data-theme="light"] {
-  --bg: #f4f4f5;
-  --card: #ffffff;
-  --fg: #09090b;
-  --dim: #a1a1aa;
-  --border: rgba(0, 0, 0, 0.1);
-  --shadow-color: rgba(0,0,0,0.1);
-  --accent-glow: rgba(0, 0, 0, 0.1);
-}
-
-/* Toggle Switch */
-.theme-toggle {
-  display: inline-block;
-  position: relative;
-  width: 50px;
-  height: 24px;
-}
-
-.theme-toggle input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.theme-toggle .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--border);
-  transition: 0.4s;
-  border: 1px solid var(--border);
-}
-
-.theme-toggle .slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 3px;
-  bottom: 3px;
-  background-color: var(--fg);
-  transition: 0.4s;
-  border-radius: 50%;
-}
-
-.theme-toggle input:checked + .slider {
-  background-color: var(--card);
-}
-
-.theme-toggle input:checked + .slider:before {
-  transform: translateX(26px);
-}
-
-/* Theme Variables */
-[data-theme="dark"] {
-  --bg: #050505;
-  --card: #0f0f0f;
-  --fg: #ffffff;
-  --dim: #525252;
-  --border: rgba(255, 255, 255, 0.08);
-  --shadow-color: #000;
-  --accent-glow: rgba(255, 255, 255, 0.2);
-}
-
-[data-theme="light"] {
-  --bg: #f4f4f5;
-  --card: #ffffff;
-  --fg: #09090b;
-  --dim: #a1a1aa;
-  --border: rgba(0, 0, 0, 0.1);
-  --shadow-color: rgba(0,0,0,0.1);
-  --accent-glow: rgba(0, 0, 0, 0.1);
-}
-
-/* Toggle Switch */
-.theme-toggle input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.theme-toggle .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--border);
-  transition: 0.4s;
-  border: 1px solid var(--border);
-}
-
-.theme-toggle .slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 3px;
-  bottom: 3px;
-  background-color: var(--fg);
-  transition: 0.4s;
-  border-radius: 50%;
-}
-
-.theme-toggle input:checked + .slider {
-  background-color: var(--card);
-}
-
-.theme-toggle input:checked + .slider:before {
-  transform: translateX(26px);
-}
-
-/* Toggle Switch */
-.theme-toggle-input {
-  display: none;
-}
-
-.theme-toggle-label {
-  display: inline-block;
-  position: relative;
-  width: 50px;
-  height: 24px;
-  cursor: pointer;
-}
-
-.theme-toggle-label .slider {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--border);
-  transition: 0.4s;
-  border: 1px solid var(--border);
-}
-
-.theme-toggle-label .slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 3px;
-  bottom: 3px;
-  background-color: var(--fg);
-  transition: 0.4s;
-  border-radius: 50%;
-}
-
-.theme-toggle-input:checked + .theme-toggle-label .slider {
-  background-color: var(--card);
-}
-
-.theme-toggle-input:checked + .theme-toggle-label .slider:before {
-  transform: translateX(26px);
-}
-
-/* Theme Variables */
-[data-theme="dark"] {
   --bg: #050505;
   --card: #0f0f0f;
   --fg: #ffffff;
@@ -734,6 +375,20 @@ nav {
   border-color: var(--border);
 }
 
+/* Header Layout */
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 2rem;
+}
+
+nav {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
 /* Toggle Switch */
 .theme-toggle-input {
   display: none;
@@ -778,16 +433,21 @@ nav {
   transform: translateX(26px);
 }
 
-/* Header */
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 2rem;
-}
+@media (max-width: 600px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 
-nav {
-  display: flex;
-  gap: 1.5rem;
-  align-items: center;
+  nav {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  nav a,
+  .theme-toggle-label {
+    width: 100%;
+    text-align: center;
+  }
 }

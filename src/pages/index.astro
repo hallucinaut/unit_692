@@ -1,56 +1,379 @@
 ---
 import { getCollection } from 'astro:content';
-import BlogLayout from '../layouts/BlogLayout.astro';
-import { formatDate, formatShortDate } from '../lib/date';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import BlogCard from '../components/ui/BlogCard.astro';
 
-// Get all blog posts sorted by date (newest first)
-const posts = (await getCollection('blog')).sort(
-	(a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-);
+// Fetch and Sort
+const allPosts = await getCollection('blog', ({ data }) => {
+  return data.date <= new Date();
+});
 
-// Get the latest 3 posts for the homepage
-const featuredPosts = posts.slice(0, 3);
-const allBlogPosts = posts.slice(3); // The rest for the blog listing
-
-const title = 'Home';
-const description = 'Welcome to my personal blog';
+const sortedPosts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+const featuredPost = sortedPosts[0];
+const recentPosts = sortedPosts.slice(1, 4);
 ---
 
-<BlogLayout title={title} description={description}>
-	<section class="hero">
-		<div class="hero-content">
-			<h2>Welcome to Superposition</h2>
-			<p>Hi, I'm a developer passionate about technology and sharing knowledge.</p>
-		</div>
-	</section>
+<BaseLayout 
+  title="Interface Système" 
+  description="Interface robotique pour les journaux de développement web."
+>
+  <div class="grid-overlay"></div>
+  
+  <section class="hero-section wrapper">
+    <div class="hero-content hover-blink">
+      <div class="terminal-header">
+        <span class="dot red"></span>
+        <span class="dot yellow"></span>
+        <span class="dot green"></span>
+        <span class="terminal-title">root@unit-690:~</span>
+      </div>
+      <div class="terminal-window">
+        <div id="terminal-feed" class="terminal-feed">
+          <!-- Flux continu -->
+        </div>
+      </div>
+    </div>
+  </section>
 
-	<section class="featured">
-		<h2>Featured Posts</h2>
-		{featuredPosts.map((post) => (
-			<article>
-				<a href={`/blog/${post.slug}/`}>
-					<h3>{post.data.title}</h3>
-					<time datetime={post.data.date}>
-						{formatDate(post.data.date)}
-					</time>
-				</a>
-				<p>{post.data.excerpt || 'Read more about this post...'}</p>
-			</article>
-		))}
-	</section>
+  <script>
+    const initActions = [
+      { 
+        cmd: "git clone https://github.com/hallucinaut/unit_690.git", 
+        result: "Cloning into 'unit_690'...\nremote: Enumerating objects: 142, done.\nremote: Total 142 (delta 21), reused 89 (delta 12)\nReceiving objects: 100% (142/142), 42.10 MiB | 12.00 MiB/s, done.\nResolving deltas: 100% (21/21), done."
+      },
+      {
+        cmd: "cd unit_690 && ls -F",
+        result: "astro.config.mjs*  package.json  public/  src/  tsconfig.json"
+      }
+    ];
 
-	<section class="recent">
-		<h2>Recent Posts</h2>
-		{allBlogPosts.map((post) => (
-			<article>
-				<a href={`/blog/${post.slug}/`}>
-					<h3>{post.data.title}</h3>
-					<time datetime={post.data.date}>
-						{formatShortDate(post.data.date)}
-					</time>
-				</a>
-			</article>
-		))}
-		<p><a href="/blog">View all posts →</a></p>
-	</section>
-</BlogLayout>
+    const loopActions = [
+      {
+        cmd: "nvidia-smi",
+        result: "NVIDIA-SMI 535.129.03   Driver Version: 535.129.03   CUDA Version: 12.2\nGPU  Name  Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC\n0  NVIDIA H100 80GB  On  | 00000000:01:00.0 Off |                    0\n[SUCCESS] Temp: 42C | Power: 65W / 350W | Memory: 24576MiB / 81920MiB"
+      },
+      { 
+        cmd: "./deploy-llm.sh --model fr.brain.carotte --quantize 4bit", 
+        result: "[INFO] Initializing Tensor Cores...\n[INFO] Loading model weights from /mnt/models/fr.brain.carotte.gguf\n[SUCCESS] Model loaded in 4.2s (VRAM usage: 24GB)\n[INFO] Quantization: 4-bit (Q4_K_M)\n[READY] API endpoint active at http://localhost:8080/v1/chat/completions"
+      },
+      { 
+        cmd: "systemctl status unit-690-agent", 
+        result: "● unit-690-agent.service - Autonomous DevSecOps Agent\n     Loaded: loaded (/etc/systemd/system/unit-690-agent.service; enabled; vendor preset: enabled)\n     Active: active (running) since Sun 2026-02-08 14:00:00 UTC\n   Main PID: 1337 (unit-690)\n      Tasks: 42 (limit: 4915)\n     Memory: 4.2G\n        CPU: 12.5%"
+      },
+      { 
+        cmd: "kubectl get pods -n production", 
+        result: "NAME                            READY   STATUS    RESTARTS   AGE\nunit-690-api-7f8b9c4d2a-x5z1y   1/1     Running   0          42h\nunit-690-worker-3d4e5f6g7h      1/1     Running   0          42h\nunit-690-db-9i8j7k6l5m          1/1     Running   0          12d"
+      },
+      { 
+        cmd: "nmap -sS -p- 192.168.1.1", 
+        result: "Starting Nmap 7.94\nNmap scan report for gateway (192.168.1.1)\nHost is up.\nPORT     STATE SERVICE\n22/tcp   open  ssh\n443/tcp  open  https\n8080/tcp open  http-proxy\n\nNmap done: 1 IP address (1 host up) scanned in 2.52 seconds"
+      },
+      {
+        cmd: "fail2ban-client status sshd",
+        result: "Status for the jail: sshd\n|- Filter\n|  |- Currently failed: 0\n|  |- Total failed: 124\n`- Actions\n   |- Currently banned: 3\n   |- Total banned: 42"
+      },
+      { 
+        cmd: "tail -n 3 /var/log/auth.log", 
+        result: "Feb 08 14:30:01 unit-690 sshd[4210]: Accepted publickey for admin from 10.0.0.5\nFeb 08 14:35:22 unit-690 sudo: admin : TTY=pts/0 ; USER=root ; COMMAND=/usr/bin/apt update"
+      },
+      { 
+        cmd: "trivy fs --quiet .", 
+        result: "Target: .\nVulnerability scanning is enabled\nDetected Cargo.lock\nCargo.lock (rust)\n=================\nTotal: 0 (CRITICAL: 0)"
+      }
+    ];
+
+    const feed = document.getElementById('terminal-feed');
+
+    function formatResult(text) {
+      return text
+        .replace(/\[SUCCESS\]/g, '<span class="text-success">[SUCCESS]</span>')
+        .replace(/\[READY\]/g, '<span class="text-success">[READY]</span>')
+        .replace(/\[INFO\]/g, '<span class="text-info">[INFO]</span>')
+        .replace(/\[AUDIT\]/g, '<span class="text-warning">[AUDIT]</span>')
+        .replace(/Running/g, '<span class="text-success">Running</span>')
+        .replace(/active \(running\)/g, '<span class="text-success">active (running)</span>')
+        .replace(/CRITICAL: 0/g, '<span class="text-success">CRITICAL: 0</span>')
+        .replace(/open/g, '<span class="text-success">open</span>')
+        .replace(/Done/g, '<span class="text-success">Done</span>')
+        .replace(/banned: [1-9][0-9]*/g, '<span class="text-warning">$&</span>')
+        .replace(/NVIDIA H100/g, '<span class="text-info">$&</span>');
+    }
+
+    function addLine(content, type) {
+      const p = document.createElement('div');
+      p.className = `line ${type}`;
+      if (type === 'result') {
+        p.innerHTML = formatResult(content);
+      } else {
+        p.innerText = content;
+      }
+      feed.appendChild(p);
+      feed.scrollTop = feed.scrollHeight;
+      
+      if (feed.childElementCount > 50) {
+        feed.removeChild(feed.firstChild);
+      }
+    }
+
+    async function executeAction(action) {
+      const prompt = document.createElement('div');
+      prompt.className = 'line prompt-line';
+      prompt.innerHTML = `<span class="user">root@unit-690:~$</span> <span class="cmd-text"></span><span class="cursor">_</span>`;
+      feed.appendChild(prompt);
+      feed.scrollTop = feed.scrollHeight;
+      
+      const cmdSpan = prompt.querySelector('.cmd-text');
+      const cursor = prompt.querySelector('.cursor');
+      
+      for (let char of action.cmd) {
+        cmdSpan.innerText += char;
+        await new Promise(r => setTimeout(r, 10 + Math.random() * 15));
+      }
+      
+      await new Promise(r => setTimeout(r, 300));
+      cursor.remove();
+      
+      if (action.result) {
+        const lines = action.result.split('\n');
+        for (let resLine of lines) {
+          addLine(resLine, 'result');
+          await new Promise(r => setTimeout(r, 10));
+        }
+      }
+    }
+
+    async function runTerminal() {
+      addLine("Welcome to UNIT_690 Terminal Interface v2.4.0", "result");
+      addLine("Last login: " + new Date().toUTCString() + " from 10.0.0.1", "result");
+      await new Promise(r => setTimeout(r, 500));
+
+      for (const action of initActions) {
+        await executeAction(action);
+        await new Promise(r => setTimeout(r, 500));
+      }
+
+      let loopIdx = 0;
+      while (true) {
+        const action = loopActions[loopIdx];
+        await executeAction(action);
+        
+        loopIdx = (loopIdx + 1) % loopActions.length;
+        await new Promise(r => setTimeout(r, 1500));
+      }
+    }
+
+    runTerminal();
+  </script>
+
+  <section class="featured-section wrapper">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span class="icon">⚡</span> DONNÉES_PRIORITAIRES
+      </h2>
+      <div class="decoration-line"></div>
+    </div>
+    
+    {featuredPost ? (
+      <div class="featured-wrapper">
+        <BlogCard post={featuredPost} loading="eager" />
+      </div>
+    ) : (
+      <p>[ERREUR]: AUCUNE_DONNÉE</p>
+    )}
+  </section>
+
+  <section class="recent-section wrapper">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span class="icon">📡</span> TRANSMISSIONS_ENTRANTES
+      </h2>
+      <a href="/blog" class="view-all">[VOIR_ARCHIVES] &rarr;</a>
+    </div>
+    
+    <div class="grid-layout">
+      {recentPosts.map(post => (
+        <BlogCard post={post} />
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .grid-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      linear-gradient(var(--border-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-position: center;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .hero-section {
+    padding-block: var(--space-2xl);
+    position: relative;
+  }
+  
+  .hero-content {
+    border: 1px solid var(--border-color);
+    background: rgba(5, 5, 5, 0.8);
+    backdrop-filter: blur(5px);
+    max-width: 800px;
+    margin: 0 auto;
+  }
+  
+  .terminal-header {
+    background: var(--color-surface-2);
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border-bottom: 1px solid var(--border-color);
+  }
+  
+  .dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+  }
+  .red { background: #ff5f56; }
+  .yellow { background: #ffbd2e; }
+  .green { background: #27c93f; }
+  
+  .terminal-title {
+    margin-left: 1rem;
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    color: var(--color-text-dim);
+  }
+  
+  .terminal-window {
+    background-color: #0d1117; /* Fond terminal GitHub Dark */
+    padding: 1rem;
+    height: 300px; /* Hauteur fixe pour éviter le saut */
+    overflow: hidden;
+    position: relative;
+  }
+
+  .terminal-feed {
+    height: 100%;
+    overflow-y: hidden; /* Scroll caché mais actif par script */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start; /* Commence en haut comme un vrai terminal */
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .line {
+    margin-bottom: 2px;
+    word-break: break-all;
+    white-space: pre-wrap; /* Préserve les espaces des logs */
+  }
+
+  .user { color: var(--color-success); font-weight: bold; }
+  .cmd-text { color: var(--color-text-1); margin-left: 0.5rem; }
+  
+  .result { 
+    color: var(--color-text-2); 
+    padding-left: 0;
+    opacity: 0.9;
+  }
+
+  /* Classes de coloration syntaxique injectées par le script */
+  :global(.text-success) { color: var(--color-success); }
+  :global(.text-info) { color: var(--color-brand-1); }
+  :global(.text-warning) { color: var(--color-warning); }
+
+  .cursor {
+    display: inline-block;
+    width: 8px;
+    height: 1em;
+    background-color: var(--color-brand-1);
+    vertical-align: text-bottom;
+    margin-left: 4px;
+    animation: blink 1s step-end infinite;
+  }
+
+  @keyframes blink {
+    50% { opacity: 0; }
+  }
+
+  .featured-section {
+    margin-block-end: var(--space-xl);
+  }
+
+  .recent-section {
+    margin-block-end: var(--space-2xl);
+  }
+
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-block-end: var(--space-m);
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: var(--space-s);
+    flex-wrap: wrap; /* Permet le passage à la ligne sur mobile */
+    gap: 1rem;
+  }
+
+  .section-title {
+    font-size: var(--step-2);
+    font-weight: 600;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    border: none;
+    padding: 0;
+    white-space: nowrap; /* Garde l'icône et le titre ensemble */
+  }
+  
+  .icon {
+    font-size: 0.8em;
+  }
+  
+  .decoration-line {
+    flex-grow: 1;
+    height: 1px;
+    background: var(--border-color);
+    margin-left: 1rem;
+    position: relative;
+  }
+  
+  .decoration-line::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: -2px;
+    width: 5px;
+    height: 5px;
+    background: var(--color-brand-1);
+  }
+
+  .view-all {
+    font-family: var(--font-mono);
+    font-weight: 600;
+    text-decoration: none;
+    color: var(--color-brand-1);
+    font-size: 0.9rem;
+  }
+  
+  .view-all:hover {
+    text-decoration: underline;
+  }
+
+  .grid-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
+    gap: var(--space-m);
+  }
+</style>

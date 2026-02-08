@@ -1,4 +1,4 @@
-# Superposition
+# UNIT_690
 
 A fast, content-focused blog built with Astro, inspired by quantum computing concepts.
 

@@ -1,0 +1,74 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+  skill: CollectionEntry<'skills'>;
+}
+
+const { skill } = Astro.props;
+---
+
+<div class="skill-card hover-blink">
+  <div class="card-header">
+    <span class="category">{skill.data.category.toUpperCase()}</span>
+  </div>
+  <h3 class="skill-title">{skill.data.title}</h3>
+  <p class="skill-desc">{skill.data.description}</p>
+  <a href={`/skills/${skill.id}`} class="access-btn">
+    EXÉCUTER <span class="blink-target">_</span>
+  </a>
+</div>
+
+<style>
+  .skill-card {
+    background: var(--color-surface-2);
+    border: 1px solid var(--border-color);
+    padding: var(--space-m);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-xs);
+    position: relative;
+  }
+
+  .skill-card:hover {
+    border-color: var(--color-brand-1);
+    box-shadow: 0 0 15px rgba(88, 166, 255, 0.1);
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    color: var(--color-text-dim);
+    border-bottom: 1px dashed var(--border-color);
+    padding-bottom: 0.5rem;
+  }
+
+  .category { color: var(--color-accent); }
+
+  .skill-title {
+    font-size: var(--step-1);
+    font-weight: 600;
+    margin: 0;
+    font-family: var(--font-mono);
+    color: var(--color-brand-1);
+  }
+
+  .skill-desc {
+    font-size: 0.9rem;
+    color: var(--color-text-2);
+    margin: 0;
+    line-height: 1.5;
+    font-family: var(--font-sans);
+  }
+
+  .access-btn {
+    margin-top: auto;
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    color: var(--color-brand-1);
+    text-decoration: none;
+    padding-top: var(--space-s);
+  }
+</style>

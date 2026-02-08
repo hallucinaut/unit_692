@@ -1,16 +1,28 @@
 import { defineCollection, z } from 'astro:content';
+import { glob } from 'astro/loaders';
 
 const blogCollection = defineCollection({
-	type: 'content',
+	loader: glob({ pattern: '**/[^_]*.md', base: './src/content/blog' }),
 	schema: z.object({
 		title: z.string(),
-		date: z.string().transform((val) => new Date(val)),
+		date: z.coerce.date(),
 		author: z.string().optional(),
 		excerpt: z.string().optional(),
 		tags: z.array(z.string()).optional(),
 	}),
 });
 
+const skillsCollection = defineCollection({
+	loader: glob({ pattern: '**/[^_]*.md', base: './src/content/skills' }),
+	schema: z.object({
+		title: z.string(),
+		description: z.string(),
+		category: z.enum(['prompt', 'workflow', 'script', 'tool']),
+		language: z.string().default('markdown'),
+	}),
+});
+
 export const collections = {
 	blog: blogCollection,
+    skills: skillsCollection,
 };
