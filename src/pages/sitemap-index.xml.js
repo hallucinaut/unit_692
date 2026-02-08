@@ -1,48 +1,50 @@
+import { getCollection } from 'astro:content';
+
 export const prerender = true;
 
-export async function GET(context) {
-	const baseUrl = 'https://myblog.com';
-	const posts = await context.locals.content?.collections?.blog;
+export async function GET() {
+  const baseUrl = 'https://agent.692.fr';
+  const blogPosts = await getCollection('blog');
+  const skills = await getCollection('skills');
 
-	if (!posts) {
-		return new Response('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>${baseUrl}/</loc></url></urlset>', {
-			headers: {
-				'Content-Type': 'application/xml',
-			},
-		});
-	}
+  const pages = [
+    { loc: `${baseUrl}/`, priority: '1.0', changefreq: 'daily' },
+    { loc: `${baseUrl}/blog`, priority: '0.8', changefreq: 'daily' },
+    { loc: `${baseUrl}/skills`, priority: '0.8', changefreq: 'daily' },
+    { loc: `${baseUrl}/about`, priority: '0.7', changefreq: 'weekly' },
+    { loc: `${baseUrl}/confidentialite`, priority: '0.3', changefreq: 'monthly' },
+  ];
 
-	const urls = [
-		{
-			loc: `${baseUrl}/`,
-			lastmod: new Date().toISOString().split('T')[0],
-			changefreq: 'daily',
-			priority: '1.0',
-		},
-		{
-			loc: `${baseUrl}/blog`,
-			lastmod: new Date().toISOString().split('T')[0],
-			changefreq: 'daily',
-			priority: '0.8',
-		},
-	];
+  blogPosts.forEach((post) => {
+    pages.push({
+      loc: `${baseUrl}/blog/${post.id}`,
+      priority: '0.6',
+      changefreq: 'weekly',
+      lastmod: post.data.date.toISOString().split('T')[0]
+    });
+  });
 
-	posts.forEach((post) => {
-		urls.push({
-			loc: `${baseUrl}/blog/${post.slug}/`,
-			lastmod: post.data.date.toISOString().split('T')[0],
-			changefreq: 'weekly',
-			priority: '0.6',
-		});
-	});
+  skills.forEach((skill) => {
+    pages.push({
+      loc: `${baseUrl}/skills/${skill.id}`,
+      priority: '0.5',
+      changefreq: 'monthly'
+    });
+  });
 
-	return urls.map(
-		(url) =>
-			`<url>
-<loc>${url.loc}</loc>
-<lastmod>${url.lastmod}</lastmod>
-<changefreq>${url.changefreq}</changefreq>
-<priority>${url.priority}</priority>
-</url>`
-	).join('\n');
+  const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${pages.map(page => `  <url>
+    <loc>${page.loc}</loc>
+    ${page.lastmod ? `<lastmod>${page.lastmod}</lastmod>` : ''}
+    <changefreq>${page.changefreq}</changefreq>
+    <priority>${page.priority}</priority>
+  </url>`).join('\n')}
+</urlset>`;
+
+  return new Response(sitemap, {
+    headers: {
+      'Content-Type': 'application/xml',
+    },
+  });
 }

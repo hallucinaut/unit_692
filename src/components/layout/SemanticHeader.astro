@@ -16,7 +16,7 @@ const currentPath = Astro.url.pathname;
       <span class="logo-unit">UNIT</span><span class="logo-number">_692</span>
     </a>
 
-    <div class="header-right">
+    <div class="header-desktop-group">
       <nav aria-label="Navigation principale" class="main-nav">
         <ul class="nav-list">
           {navItems.map(({ href, label }) => {
@@ -31,97 +31,161 @@ const currentPath = Astro.url.pathname;
           })}
         </ul>
       </nav>
+      
       <div class="status-indicator hover-blink">
         <span class="status-dot blink-target"></span>
         <span class="status-text">EN LIGNE</span>
       </div>
     </div>
+
+    <button class="mobile-toggle" id="menu-toggle" aria-expanded="false" aria-label="Menu principal">
+      <div class="burger-box">
+        <span class="burger-inner"></span>
+      </div>
+    </button>
+  </div>
+
+  <div class="mobile-drawer" id="nav-drawer">
+    <nav class="mobile-nav">
+      <ul class="mobile-nav-list">
+        {navItems.map(({ href, label }) => {
+          const isActive = currentPath === href || (href !== '/' && currentPath.startsWith(href));
+          return (
+            <li>
+              <a href={href} class:list={['mobile-nav-link', { 'active': isActive }]}>
+                {label}
+              </a>
+            </li>
+          );
+        })}
+      </ul>
+    </nav>
+    <div class="mobile-status">
+      <span class="status-dot"></span>
+      <span>SYSTÈME EN LIGNE</span>
+    </div>
   </div>
 </header>
 
+<script>
+  function setupMenu() {
+    const toggle = document.getElementById('menu-toggle');
+    const drawer = document.getElementById('nav-drawer');
+    const html = document.documentElement;
+    
+    if (!toggle || !drawer) return;
+
+    const newToggle = toggle.cloneNode(true);
+    toggle.parentNode?.replaceChild(newToggle, toggle);
+    
+    const toggleMenu = () => {
+      const isExpanded = newToggle.getAttribute('aria-expanded') === 'true';
+      newToggle.setAttribute('aria-expanded', String(!isExpanded));
+      drawer.classList.toggle('open');
+      html.style.overflow = isExpanded ? '' : 'hidden';
+    };
+
+    newToggle.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleMenu();
+    });
+
+    drawer.querySelectorAll('a').forEach(link => {
+      link.addEventListener('click', () => {
+        newToggle.setAttribute('aria-expanded', 'false');
+        drawer.classList.remove('open');
+        html.style.overflow = '';
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (drawer.classList.contains('open') && 
+          !drawer.contains(e.target as Node) && 
+          !newToggle.contains(e.target as Node)) {
+        newToggle.setAttribute('aria-expanded', 'false');
+        drawer.classList.remove('open');
+        html.style.overflow = '';
+      }
+    });
+  }
+
+  setupMenu();
+  document.addEventListener('astro:page-load', setupMenu);
+</script>
+
 <style>
+  /* --- VARIABLES --- */
+  :root {
+    --header-height: 64px; /* Fixed height for perfect centering */
+  }
+
+  /* --- LAYOUT: HEADER BAR --- */
   .site-header {
-    padding-block: 0.75rem;
     background-color: var(--color-surface-2);
     border-bottom: 1px solid var(--border-color);
     position: sticky;
     top: 0;
-    z-index: 100;
+    z-index: 1000;
+    height: var(--header-height);
+    width: 100%;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
   }
 
   .header-inner {
+    height: 100%;
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    flex-wrap: nowrap;
+    align-items: center; /* THE MAGIC PROPERTY: Centers children vertically */
   }
 
+  /* --- ELEMENT: LOGO --- */
   .logo {
+    height: 100%; /* Fill header height */
+    display: flex;
+    align-items: center; /* Center text inside logo container */
     font-family: var(--font-mono);
-    font-size: var(--step-0);
+    font-size: 1.1rem;
     font-weight: 600;
     text-decoration: none;
-    /* Suppression de la couleur globale pour laisser les spans s'exprimer */
     border: none;
-    display: flex;
-    align-items: center;
-    gap: 0.2rem;
-    line-height: 1;
+    gap: 0.3rem;
+    z-index: 1002;
+    padding: 0;
     margin: 0;
   }
+  
+  .logo:hover { background: transparent; border: none; }
+  .logo .sys-prefix { color: var(--color-text-dim); font-size: 0.75em; }
+  .logo .logo-unit { color: var(--color-brand-1); font-weight: 700; }
+  .logo .logo-number { color: var(--color-brand-2); font-weight: 700; }
 
-  .logo:hover {
-    background: transparent;
-    border: none;
-  }
-
-  /* Utilisation de sélecteurs plus spécifiques pour garantir l'affichage immédiat */
-  .logo .sys-prefix {
-    color: var(--color-text-dim) !important;
-    font-size: 0.75em;
-    font-weight: 400;
-    margin-right: 0.3rem;
-    border: none;
-  }
-
-  .logo .logo-unit {
-    color: var(--color-brand-1) !important;
-    font-weight: 700;
-    border: none;
-  }
-
-  .logo .logo-number {
-    color: var(--color-brand-2) !important;
-    font-weight: 700;
-    border: none;
-  }
-
-  .header-right {
+  /* --- ELEMENT: DESKTOP NAV GROUP --- */
+  .header-desktop-group {
     display: flex;
-    align-items: center;
-    gap: var(--space-l);
+    align-items: center; /* Centers Nav and Status relative to each other */
+    gap: 2rem;
+    height: 100%;
   }
 
   .main-nav {
     display: flex;
     align-items: center;
+    height: 32px; /* Match nav-link height */
+    margin: 0; /* Override global nav styles */
   }
 
   .nav-list {
     display: flex;
     list-style: none;
     padding: 0;
-    margin: 0;
-    gap: 0.25rem;
+    margin: auto 0; /* Vertical centering */
+    gap: 0.5rem;
     align-items: center;
   }
 
   .nav-list li {
     display: flex;
     align-items: center;
-    margin: 0;
-    padding: 0;
   }
 
   .nav-link {
@@ -133,60 +197,131 @@ const currentPath = Astro.url.pathname;
     font-weight: 500;
     color: var(--color-text-2);
     background: transparent;
-    height: 2rem;
-    padding-inline: 0.8rem;
     border: 1px solid transparent;
     transition: all 0.2s ease;
     text-transform: uppercase;
     font-size: 0.75rem;
     letter-spacing: 0.05em;
-    line-height: 1;
+    border-radius: 2px;
+    
+    /* CONTROL HEIGHT AND PADDING EXPLICITLY */
+    height: 32px; /* Fixed height for buttons */
+    padding: 0 12px;
+    line-height: 1; /* Remove line-height variability */
   }
 
-  .nav-link:hover,
-  .nav-link.active {
+  .nav-link:hover, .nav-link.active {
     color: #000000 !important;
     background-color: var(--color-brand-1);
     box-shadow: 0 0 10px var(--color-brand-1);
-    border-bottom: none !important;
+    border-color: var(--color-brand-1);
+    border-bottom: none !important; /* Override global link styles */
   }
-  
+
+  /* --- ELEMENT: STATUS INDICATOR --- */
   .status-indicator {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 0.5rem;
     font-family: var(--font-mono);
     font-size: 0.7rem;
     color: var(--color-success);
     border: 1px solid var(--color-success);
-    height: 1.8rem;
-    padding-inline: 0.6rem;
     background: rgba(63, 185, 80, 0.1);
     cursor: default;
+    white-space: nowrap;
+    
+    /* MATCH NAV LINK HEIGHT */
+    height: 32px;
+    padding: 0 12px;
     line-height: 1;
   }
 
   .status-dot {
-    width: 8px;
-    height: 8px;
+    width: 6px;
+    height: 6px;
     background-color: var(--color-success);
     border-radius: 50%;
   }
 
-  @media (max-width: 600px) {
-    .header-right {
-      width: 100%;
-      flex-direction: column;
-      align-items: stretch;
-      gap: var(--space-s);
-    }
-    
-    .nav-list {
-      justify-content: space-between;
-    }
-    
-    .status-indicator {
-      display: none;
-    }
+  /* --- ELEMENT: MOBILE TOGGLE --- */
+  .mobile-toggle {
+    display: none;
+    background: transparent;
+    border: 1px solid var(--border-color);
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    cursor: pointer;
+    z-index: 1002;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .burger-box { width: 18px; height: 14px; position: relative; }
+  .burger-inner { display: block; top: 50%; margin-top: -1px; }
+  .burger-inner, .burger-inner::before, .burger-inner::after {
+    width: 18px; height: 2px; background-color: var(--color-brand-1);
+    position: absolute; transition: transform 0.2s ease;
+  }
+  .burger-inner::before { content: ""; top: -6px; }
+  .burger-inner::after { content: ""; bottom: -6px; }
+
+  /* Burger Animation */
+  .mobile-toggle[aria-expanded="true"] .burger-inner { transform: rotate(45deg); }
+  .mobile-toggle[aria-expanded="true"] .burger-inner::before { top: 0; opacity: 0; }
+  .mobile-toggle[aria-expanded="true"] .burger-inner::after { bottom: 0; transform: rotate(-90deg); }
+
+  /* --- ELEMENT: MOBILE DRAWER --- */
+  .mobile-drawer {
+    position: fixed;
+    top: var(--header-height);
+    left: 0;
+    width: 100%;
+    height: calc(100vh - var(--header-height));
+    background: var(--color-surface-1);
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 2rem;
+    gap: 2rem;
+    transform: translateX(100%);
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 999;
+  }
+  
+  .mobile-drawer.open { transform: translateX(0); }
+
+  .mobile-nav-list {
+    list-style: none; padding: 0; margin: 0;
+    display: flex; flex-direction: column; gap: 1rem;
+  }
+
+  .mobile-nav-link {
+    display: flex; justify-content: center; align-items: center;
+    width: 100%; height: 3rem;
+    font-family: var(--font-mono); font-size: 0.9rem;
+    border: 1px solid var(--border-color);
+    color: var(--color-text-1);
+    text-transform: uppercase;
+    text-decoration: none;
+  }
+
+  .mobile-nav-link.active {
+    background: var(--color-brand-1); color: #000; border-color: var(--color-brand-1);
+  }
+
+  .mobile-status {
+    margin-top: auto; display: flex; justify-content: center; align-items: center;
+    gap: 0.5rem; font-family: var(--font-mono); font-size: 0.85rem;
+    color: var(--color-success);
+    border: 1px solid var(--color-success); padding: 0.875rem;
+  }
+
+  /* --- RESPONSIVE BREAKPOINT --- */
+  @media (max-width: 800px) {
+    .header-desktop-group { display: none; }
+    .mobile-toggle { display: flex; }
   }
 </style>

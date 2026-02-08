@@ -387,4 +387,20 @@ const recentPosts = sortedPosts.slice(1, 4);
     grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
     gap: var(--space-m);
   }
+
+  /* Mobile responsive adjustments */
+  @media (max-width: 600px) {
+    .section-title {
+      font-size: var(--step-0);
+      gap: 0.35rem;
+    }
+
+    .icon {
+      font-size: 0.85em;
+    }
+
+    .view-all {
+      font-size: 0.8rem;
+    }
+  }
 </style>
