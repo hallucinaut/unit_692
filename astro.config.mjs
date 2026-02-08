@@ -13,12 +13,6 @@ export default defineConfig({
   integrations: [
     sitemap()
   ],
-  image: {
-    domains: ['images.unsplash.com'],
-    service: {
-      entrypoint: 'astro/assets/services/sharp',
-    },
-  },
   build: {
     inlineStylesheets: 'auto',
   },
