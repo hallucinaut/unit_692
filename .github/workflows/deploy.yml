@@ -14,12 +14,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: checkout_repository
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@v4
         with:
           persist-credentials: false
 
       - name: setup_node_env
-        uses: actions/setup-node@1d429da20d2236b5a397fbe3bd51b893dd321f58 # v4.1.0
+        uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: 'npm'
@@ -39,7 +39,7 @@ jobs:
           NODE_ENV: production
 
       - name: upload_pages_artifact
-        uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dee4629af255 # v3.0.1
+        uses: actions/upload-pages-artifact@v3
         with:
           path: ./dist
 
@@ -55,4 +55,4 @@ jobs:
     steps:
       - name: deploy_to_pages
         id: deployment
-        uses: actions/deploy-pages@d6db90164ac5ed86f2b6aed7e0fedfffbda886e4 # v4.0.5
+        uses: actions/deploy-pages@v4
