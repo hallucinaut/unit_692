@@ -1,9 +1,9 @@
 ---
 const navItems = [
-  { href: '/', label: 'QG' },
-  { href: '/blog', label: 'JOURNAUX' },
-  { href: '/skills', label: 'SKILLS' },
-  { href: '/about', label: 'DONNÉES' },
+  { href: `${import.meta.env.BASE_URL}`, label: 'QG' },
+  { href: `${import.meta.env.BASE_URL}blog`, label: 'JOURNAUX' },
+  { href: `${import.meta.env.BASE_URL}skills`, label: 'SKILLS' },
+  { href: `${import.meta.env.BASE_URL}about`, label: 'DONNÉES' },
 ];
 
 const currentPath = Astro.url.pathname;

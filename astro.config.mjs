@@ -3,8 +3,8 @@ import sitemap from '@astrojs/sitemap';
 
 // https://astro.build/config
 export default defineConfig({
-  site: 'https://hallucinaut.github.io',
-  base: '/unit_692/',
+  site: 'https://agent.692.fr',
+  base: '/',
   compressHTML: true,
   prefetch: {
     prefetchAll: true,
