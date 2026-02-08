@@ -22,7 +22,7 @@ const description = 'All my blog posts about technology, coding, and more.';
 				<a href={`/blog/${post.slug}/`}>
 					<h2>{post.data.title}</h2>
 				</a>
-				<time datetime={post.data.date.toISOString()}>
+				<time datetime={post.data.date}>
 					{formatDate(post.data.date)}
 				</time>
 				{post.data.tags?.length > 0 && (

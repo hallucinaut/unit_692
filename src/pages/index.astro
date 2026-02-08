@@ -28,7 +28,7 @@ const description = 'Welcome to my personal blog';
 			<article>
 				<a href={`/blog/${post.slug}/`}>
 					<h3>{post.data.title}</h3>
-					<time datetime={post.data.date.toISOString()}>
+					<time datetime={post.data.date}>
 						{formatDate(post.data.date)}
 					</time>
 				</a>
@@ -43,7 +43,7 @@ const description = 'Welcome to my personal blog';
 			<article>
 				<a href={`/blog/${post.slug}/`}>
 					<h3>{post.data.title}</h3>
-					<time datetime={post.data.date.toISOString()}>
+					<time datetime={post.data.date}>
 						{formatShortDate(post.data.date)}
 					</time>
 				</a>

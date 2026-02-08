@@ -36,7 +36,7 @@ const description = post.data.description || post.data.excerpt;
 				By <cite>{post.data.author}</cite>
 			</p>
 		)}
-		<time datetime={post.data.date.toISOString()}>
+		<time datetime={post.data.date}>
 			{formatDate(post.data.date)}
 		</time>
 
