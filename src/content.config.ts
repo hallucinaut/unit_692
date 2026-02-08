@@ -13,7 +13,7 @@ const blogCollection = defineCollection({
 });
 
 const skillsCollection = defineCollection({
-	loader: glob({ pattern: '**/[^_]*.md', base: './src/content/skills' }),
+	loader: glob({ pattern: '**/[^_]*.md', base: 'src/content/skills' }),
 	schema: z.object({
 		title: z.string(),
 		description: z.string(),

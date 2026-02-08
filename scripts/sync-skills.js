@@ -13,11 +13,10 @@ const TARGET_DIR = path.join(__dirname, '../src/content/skills');
 function syncSkills() {
     console.log('🔄 Starting skills synchronization...');
 
-    // 1. Clean and recreate target directory
-    if (fs.existsSync(TARGET_DIR)) {
-        fs.rmSync(TARGET_DIR, { recursive: true, force: true });
+    // 1. Prepare target directory
+    if (!fs.existsSync(TARGET_DIR)) {
+        fs.mkdirSync(TARGET_DIR, { recursive: true });
     }
-    fs.mkdirSync(TARGET_DIR, { recursive: true });
 
     // 2. Clone or update repository
     if (fs.existsSync(TEMP_DIR)) {
@@ -42,6 +41,7 @@ function syncSkills() {
     }
 
     const items = fs.readdirSync(skillsSourceDir);
+    const validFiles = new Set();
     let count = 0;
 
     items.forEach(item => {
@@ -52,7 +52,6 @@ function syncSkills() {
             const content = fs.readFileSync(skillFile, 'utf-8');
             
             // Parse Frontmatter manually
-            // Regex to capture content between --- and ---
             const match = content.match(/^---\r?\n([\s\S]*?)\r?\n---/);
             let frontmatter = {};
             let body = content;
@@ -90,9 +89,19 @@ language: "${newFrontmatter.language}"
 
 ${body}
 `;
-
-            fs.writeFileSync(path.join(TARGET_DIR, `${item}.md`), newContent);
+            const targetFile = path.join(TARGET_DIR, `${item}.md`);
+            fs.writeFileSync(targetFile, newContent);
+            validFiles.add(`${item}.md`);
             count++;
+        }
+    });
+
+    // 4. Clean up stale files in target directory
+    const existingFiles = fs.readdirSync(TARGET_DIR);
+    existingFiles.forEach(file => {
+        if (!validFiles.has(file) && file.endsWith('.md')) {
+            fs.unlinkSync(path.join(TARGET_DIR, file));
+            console.log(`🗑️ Removed stale skill: ${file}`);
         }
     });
 
