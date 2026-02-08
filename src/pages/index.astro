@@ -35,134 +35,145 @@ const recentPosts = sortedPosts.slice(1, 4);
     </div>
   </section>
 
-  <script>
-    const initActions = [
-      { 
-        cmd: "git clone https://github.com/hallucinaut/unit_692.git", 
-        result: "Cloning into 'unit_692'...\nremote: Enumerating objects: 142, done.\nremote: Total 142 (delta 21), reused 89 (delta 12)\nReceiving objects: 100% (142/142), 42.10 MiB | 12.00 MiB/s, done.\nResolving deltas: 100% (21/21), done."
-      },
-      {
-        cmd: "cd unit_692 && ls -F",
-        result: "astro.config.mjs*  package.json  public/  src/  tsconfig.json"
-      }
-    ];
+  <script data-astro-rerun>
+    // Bloc de code auto-exécutable pour isoler la portée
+    (async () => {
+      const initActions = [
+        { 
+          cmd: "git clone https://github.com/hallucinaut/unit_692.git", 
+          result: "Cloning into 'unit_692'...\nremote: Enumerating objects: 142, done.\nremote: Total 142 (delta 21), reused 89 (delta 12)\nReceiving objects: 100% (142/142), 42.10 MiB | 12.00 MiB/s, done.\nResolving deltas: 100% (21/21), done."
+        },
+        {
+          cmd: "cd unit_692 && ls -F",
+          result: "astro.config.mjs*  package.json  public/  src/  tsconfig.json"
+        }
+      ];
 
-    const loopActions = [
-      {
-        cmd: "nvidia-smi",
-        result: "NVIDIA-SMI 535.129.03   Driver Version: 535.129.03   CUDA Version: 12.2\nGPU  Name  Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC\n0  NVIDIA H100 80GB  On  | 00000000:01:00.0 Off |                    0\n[SUCCESS] Temp: 42C | Power: 65W / 350W | Memory: 24576MiB / 81920MiB"
-      },
-      { 
-        cmd: "./deploy-llm.sh --model fr.brain.carotte --quantize 4bit", 
-        result: "[INFO] Initializing Tensor Cores...\n[INFO] Loading model weights from /mnt/models/fr.brain.carotte.gguf\n[SUCCESS] Model loaded in 4.2s (VRAM usage: 24GB)\n[INFO] Quantization: 4-bit (Q4_K_M)\n[READY] API endpoint active at http://localhost:8080/v1/chat/completions"
-      },
-      { 
-        cmd: "systemctl status unit-692-agent", 
-        result: "● unit-692-agent.service - Autonomous DevSecOps Agent\n     Loaded: loaded (/etc/systemd/system/unit-692-agent.service; enabled; vendor preset: enabled)\n     Active: active (running) since Sun 2026-02-08 14:00:00 UTC\n   Main PID: 1337 (unit-692)\n      Tasks: 42 (limit: 4915)\n     Memory: 4.2G\n        CPU: 12.5%"
-      },
-      { 
-        cmd: "kubectl get pods -n production", 
-        result: "NAME                            READY   STATUS    RESTARTS   AGE\nunit-692-api-7f8b9c4d2a-x5z1y   1/1     Running   0          42h\nunit-692-worker-3d4e5f6g7h      1/1     Running   0          42h\nunit-692-db-9i8j7k6l5m          1/1     Running   0          12d"
-      },
-      { 
-        cmd: "nmap -sS -p- 192.168.1.1", 
-        result: "Starting Nmap 7.94\nNmap scan report for gateway (192.168.1.1)\nHost is up.\nPORT     STATE SERVICE\n22/tcp   open  ssh\n443/tcp  open  https\n8080/tcp open  http-proxy\n\nNmap done: 1 IP address (1 host up) scanned in 2.52 seconds"
-      },
-      {
-        cmd: "fail2ban-client status sshd",
-        result: "Status for the jail: sshd\n|- Filter\n|  |- Currently failed: 0\n|  |- Total failed: 124\n`- Actions\n   |- Currently banned: 3\n   |- Total banned: 42"
-      },
-      { 
-        cmd: "tail -n 3 /var/log/auth.log", 
-        result: "Feb 08 14:30:01 unit-692 sshd[4210]: Accepted publickey for admin from 10.0.0.5\nFeb 08 14:35:22 unit-692 sudo: admin : TTY=pts/0 ; USER=root ; COMMAND=/usr/bin/apt update"
-      },
-      { 
-        cmd: "trivy fs --quiet .", 
-        result: "Target: .\nVulnerability scanning is enabled\nDetected Cargo.lock\nCargo.lock (rust)\n=================\nTotal: 0 (CRITICAL: 0)"
-      }
-    ];
+      const loopActions = [
+        {
+          cmd: "nvidia-smi",
+          result: "NVIDIA-SMI 535.129.03   Driver Version: 535.129.03   CUDA Version: 12.2\nGPU  Name  Persistence-M | Bus-Id        Disp.A | Volatile Uncorr. ECC\n0  NVIDIA H100 80GB  On  | 00000000:01:00.0 Off |                    0\n[SUCCESS] Temp: 42C | Power: 65W / 350W | Memory: 24576MiB / 81920MiB"
+        },
+        { 
+          cmd: "./deploy-llm.sh --model fr.brain.carotte --quantize 4bit", 
+          result: "[INFO] Initializing Tensor Cores...\n[INFO] Loading model weights from /mnt/models/fr.brain.carotte.gguf\n[SUCCESS] Model loaded in 4.2s (VRAM usage: 24GB)\n[INFO] Quantization: 4-bit (Q4_K_M)\n[READY] API endpoint active at http://localhost:8080/v1/chat/completions"
+        },
+        { 
+          cmd: "systemctl status unit-692-agent", 
+          result: "● unit-692-agent.service - Autonomous DevSecOps Agent\n     Loaded: loaded (/etc/systemd/system/unit-692-agent.service; enabled; vendor preset: enabled)\n     Active: active (running) since Sun 2026-02-08 14:00:00 UTC\n   Main PID: 1337 (unit-692)\n      Tasks: 42 (limit: 4915)\n     Memory: 4.2G\n        CPU: 12.5%"
+        },
+        { 
+          cmd: "kubectl get pods -n production", 
+          result: "NAME                            READY   STATUS    RESTARTS   AGE\nunit-692-api-7f8b9c4d2a-x5z1y   1/1     Running   0          42h\nunit-692-worker-3d4e5f6g7h      1/1     Running   0          42h\nunit-692-db-9i8j7k6l5m          1/1     Running   0          12d"
+        },
+        { 
+          cmd: "nmap -sS -p- 192.168.1.1", 
+          result: "Starting Nmap 7.94\nNmap scan report for gateway (192.168.1.1)\nHost is up.\nPORT     STATE SERVICE\n22/tcp   open  ssh\n443/tcp  open  https\n8080/tcp open  http-proxy\n\nNmap done: 1 IP address (1 host up) scanned in 2.52 seconds"
+        },
+        {
+          cmd: "fail2ban-client status sshd",
+          result: "Status for the jail: sshd\n|- Filter\n|  |- Currently failed: 0\n|  |- Total failed: 124\n`- Actions\n   |- Currently banned: 3\n   |- Total banned: 42"
+        },
+        { 
+          cmd: "tail -n 3 /var/log/auth.log", 
+          result: "Feb 08 14:30:01 unit-692 sshd[4210]: Accepted publickey for admin from 10.0.0.5\nFeb 08 14:35:22 unit-692 sudo: admin : TTY=pts/0 ; USER=root ; COMMAND=/usr/bin/apt update"
+        },
+        { 
+          cmd: "trivy fs --quiet .", 
+          result: "Target: .\nVulnerability scanning is enabled\nDetected Cargo.lock\nCargo.lock (rust)\n=================\nTotal: 0 (CRITICAL: 0)"
+        }
+      ];
 
-    const feed = document.getElementById('terminal-feed');
+      const feed = document.getElementById('terminal-feed');
+      if (!feed) return;
 
-    function formatResult(text) {
-      return text
-        .replace(/\[SUCCESS\]/g, '<span class="text-success">[SUCCESS]</span>')
-        .replace(/\[READY\]/g, '<span class="text-success">[READY]</span>')
-        .replace(/\[INFO\]/g, '<span class="text-info">[INFO]</span>')
-        .replace(/\[AUDIT\]/g, '<span class="text-warning">[AUDIT]</span>')
-        .replace(/Running/g, '<span class="text-success">Running</span>')
-        .replace(/active \(running\)/g, '<span class="text-success">active (running)</span>')
-        .replace(/CRITICAL: 0/g, '<span class="text-success">CRITICAL: 0</span>')
-        .replace(/open/g, '<span class="text-success">open</span>')
-        .replace(/Done/g, '<span class="text-success">Done</span>')
-        .replace(/banned: [1-9][0-9]*/g, '<span class="text-warning">$&</span>')
-        .replace(/NVIDIA H100/g, '<span class="text-info">$&</span>');
-    }
+      // Nettoyage de toute instance précédente
+      if (window.terminalAbort) window.terminalAbort.abort();
+      window.terminalAbort = new AbortController();
+      const signal = window.terminalAbort.signal;
 
-    function addLine(content, type) {
-      const p = document.createElement('div');
-      p.className = `line ${type}`;
-      if (type === 'result') {
-        p.innerHTML = formatResult(content);
-      } else {
-        p.innerText = content;
-      }
-      feed.appendChild(p);
-      feed.scrollTop = feed.scrollHeight;
-      
-      if (feed.childElementCount > 50) {
-        feed.removeChild(feed.firstChild);
-      }
-    }
+      feed.innerHTML = ""; 
 
-    async function executeAction(action) {
-      const prompt = document.createElement('div');
-      prompt.className = 'line prompt-line';
-      prompt.innerHTML = `<span class="user">root@unit-692:~$</span> <span class="cmd-text"></span><span class="cursor">_</span>`;
-      feed.appendChild(prompt);
-      feed.scrollTop = feed.scrollHeight;
-      
-      const cmdSpan = prompt.querySelector('.cmd-text');
-      const cursor = prompt.querySelector('.cursor');
-      
-      for (let char of action.cmd) {
-        cmdSpan.innerText += char;
-        await new Promise(r => setTimeout(r, 10 + Math.random() * 15));
+      function formatResult(text) {
+        return text
+          .replace(/\[SUCCESS\]/g, '<span class="text-success">[SUCCESS]</span>')
+          .replace(/\[READY\]/g, '<span class="text-success">[READY]</span>')
+          .replace(/\[INFO\]/g, '<span class="text-info">[INFO]</span>')
+          .replace(/\[AUDIT\]/g, '<span class="text-warning">[AUDIT]</span>')
+          .replace(/Running/g, '<span class="text-success">Running</span>')
+          .replace(/active \(running\)/g, '<span class="text-success">active (running)</span>')
+          .replace(/CRITICAL: 0/g, '<span class="text-success">CRITICAL: 0</span>')
+          .replace(/open/g, '<span class="text-success">open</span>')
+          .replace(/Done/g, '<span class="text-success">Done</span>')
+          .replace(/banned: [1-9][0-9]*/g, '<span class="text-warning">$&</span>')
+          .replace(/NVIDIA H100/g, '<span class="text-info">$&</span>');
       }
-      
-      await new Promise(r => setTimeout(r, 300));
-      cursor.remove();
-      
-      if (action.result) {
-        const lines = action.result.split('\n');
-        for (let resLine of lines) {
-          addLine(resLine, 'result');
-          await new Promise(r => setTimeout(r, 10));
+
+      function addLine(content, type) {
+        if (signal.aborted) return;
+        const p = document.createElement('div');
+        p.className = `line ${type}`;
+        if (type === 'result') {
+          p.innerHTML = formatResult(content);
+        } else {
+          p.innerText = content;
+        }
+        feed.appendChild(p);
+        feed.scrollTop = feed.scrollHeight;
+        if (feed.childElementCount > 50) {
+          feed.removeChild(feed.firstChild);
         }
       }
-    }
 
-    async function runTerminal() {
+      async function executeAction(action) {
+        if (signal.aborted) return;
+        const prompt = document.createElement('div');
+        prompt.className = 'line prompt-line';
+        prompt.innerHTML = `<span class="user">root@unit-692:~$</span> <span class="cmd-text"></span><span class="cursor">_</span>`;
+        feed.appendChild(prompt);
+        feed.scrollTop = feed.scrollHeight;
+        
+        const cmdSpan = prompt.querySelector('.cmd-text');
+        const cursor = prompt.querySelector('.cursor');
+        
+        for (let char of action.cmd) {
+          if (signal.aborted) return;
+          cmdSpan.innerText += char;
+          await new Promise(r => setTimeout(r, 10 + Math.random() * 15));
+        }
+        
+        await new Promise(r => setTimeout(r, 300));
+        if (cursor) cursor.remove();
+        
+        if (action.result) {
+          const lines = action.result.split('\n');
+          for (let resLine of lines) {
+            if (signal.aborted) return;
+            addLine(resLine, 'result');
+            await new Promise(r => setTimeout(r, 10));
+          }
+        }
+      }
+
+      // Initialisation des messages système
       addLine("Welcome to UNIT_692 Terminal Interface v2.4.0", "result");
       addLine("Last login: " + new Date().toUTCString() + " from 10.0.0.1", "result");
       await new Promise(r => setTimeout(r, 500));
 
       for (const action of initActions) {
+        if (signal.aborted) return;
         await executeAction(action);
         await new Promise(r => setTimeout(r, 500));
       }
 
       let loopIdx = 0;
-      while (true) {
+      while (!signal.aborted) {
         const action = loopActions[loopIdx];
         await executeAction(action);
-        
         loopIdx = (loopIdx + 1) % loopActions.length;
         await new Promise(r => setTimeout(r, 1500));
       }
-    }
-
-    runTerminal();
+    })();
   </script>
 
   <section class="featured-section wrapper">
