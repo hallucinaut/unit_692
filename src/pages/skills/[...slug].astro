@@ -48,11 +48,11 @@ const { Content } = await render(skill);
     if (content) {
       const text = content.innerText;
       await navigator.clipboard.writeText(text);
-      
+
       const originalText = copyBtn.innerText;
       copyBtn.innerText = 'COPIÉ !';
       copyBtn.classList.add('active');
-      
+
       setTimeout(() => {
         copyBtn.innerText = originalText;
         copyBtn.classList.remove('active');
@@ -62,14 +62,143 @@ const { Content } = await render(skill);
 </script>
 
 <style>
-  /* ... styles existants ... */
+  .grid-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+      linear-gradient(var(--border-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-position: center;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .skill-detail {
+    padding-block: var(--space-2xl);
+  }
+
+  .skill-header {
+    position: relative;
+    padding: var(--space-xl);
+    background: var(--color-surface-2);
+    border: 1px solid var(--border-color);
+    margin-bottom: var(--space-xl);
+    overflow: hidden;
+  }
+
+  .skill-header::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--color-brand-1), var(--color-brand-2), transparent);
+  }
+
+  .skill-header::after {
+    content: '';
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: 60px;
+    height: 60px;
+    border: 2px solid var(--border-color);
+    border-radius: 50%;
+    opacity: 0.3;
+  }
+
+  .meta-bar {
+    display: flex;
+    gap: var(--space-m);
+    color: var(--color-text-dim);
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    margin-bottom: var(--space-m);
+    padding-bottom: var(--space-s);
+    border-bottom: 1px dashed var(--border-color);
+  }
+
+  .meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .meta-item::before {
+    content: '▸';
+    color: var(--color-brand-1);
+    font-weight: bold;
+  }
+
+  .skill-title {
+    font-family: var(--font-mono);
+    font-size: var(--step-4);
+    color: var(--color-brand-1);
+    margin-bottom: var(--space-m);
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    line-height: 1.2;
+    position: relative;
+    z-index: 1;
+  }
+
+  .skill-intro {
+    font-size: var(--step-0);
+    color: var(--color-text-2);
+    line-height: 1.7;
+    max-width: 70ch;
+    font-family: var(--font-sans);
+    border-left: 3px solid var(--color-brand-2);
+    padding-left: var(--space-m);
+    background: rgba(255, 138, 101, 0.05);
+    padding: var(--space-s) var(--space-m);
+  }
+
+  .skill-content-container {
+    border: 1px solid var(--border-color);
+    background: var(--color-surface-1);
+    margin-bottom: var(--space-l);
+  }
+
   .content-header {
-    background: var(--color-surface-3);
-    border-bottom: 1px solid var(--border-color);
-    padding: 0.5rem 1rem;
+    background: var(--color-surface-2);
+    border-bottom: 2px solid var(--border-color);
+    padding: var(--space-s) var(--space-m);
     display: flex;
     justify-content: space-between;
     align-items: center;
+  }
+
+  .tab {
+    font-family: var(--font-mono);
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--color-brand-1);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .tab.active {
+    position: relative;
+  }
+
+  .tab.active::before {
+    content: '■';
+    margin-right: 0.5rem;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
   }
 
   .copy-btn {
@@ -77,26 +206,172 @@ const { Content } = await render(skill);
     border: 1px solid var(--color-brand-1);
     color: var(--color-brand-1);
     font-family: var(--font-mono);
-    font-size: 0.7rem;
-    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: var(--space-xs) var(--space-s);
     cursor: pointer;
     transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
 
   .copy-btn:hover, .copy-btn.active {
     background: var(--color-brand-1);
-    color: #000000 !important;
+    color: #000000;
+    box-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
   }
 
+  .skill-content {
+    padding: var(--space-xl);
+    font-size: var(--step-0);
+    line-height: 1.8;
+    font-family: var(--font-sans);
+    color: var(--color-text-1);
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-family: var(--font-mono);
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-brand-1);
+    text-decoration: none;
+    padding: var(--space-s) var(--space-m);
+    border: 1px solid var(--color-brand-1);
+    transition: all 0.2s ease;
+  }
+
+  .back-link::before {
+    content: '←';
+    font-size: 1.2em;
+  }
+
+  .back-link:hover {
+    background: var(--color-brand-1);
+    color: #000;
+    box-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
+  }
+
+  /* Content markdown styles */
+  :global(.skill-content h2) {
+    font-size: var(--step-2);
+    color: var(--color-brand-1);
+    margin-top: var(--space-l);
+    margin-bottom: var(--space-m);
+    font-family: var(--font-mono);
+  }
+
+  :global(.skill-content h3) {
+    font-size: var(--step-1);
+    color: var(--color-brand-2);
+    margin-top: var(--space-m);
+    margin-bottom: var(--space-s);
+    font-family: var(--font-mono);
+  }
+
+  :global(.skill-content p) {
+    margin-bottom: var(--space-m);
+  }
+
+  :global(.skill-content ul, .skill-content ol) {
+    margin-bottom: var(--space-m);
+    padding-left: var(--space-l);
+  }
+
+  :global(.skill-content li) {
+    margin-bottom: var(--space-xs);
+  }
+
+  :global(.skill-content code) {
+    font-family: var(--font-mono);
+    background: rgba(88, 166, 255, 0.1);
+    padding: 0.2em 0.4em;
+    border-radius: 2px;
+    color: var(--color-brand-2);
+    font-size: 0.9em;
+  }
+
+  :global(.skill-content pre) {
+    background: #000;
+    border: 1px solid var(--border-color);
+    padding: var(--space-m);
+    overflow-x: auto;
+    margin-bottom: var(--space-m);
+  }
+
+  :global(.skill-content pre code) {
+    background: transparent;
+    padding: 0;
+    color: #e0e0e0;
+  }
+
+  /* Mobile responsive adjustments */
   @media (max-width: 600px) {
+    .skill-detail {
+      padding-block: var(--space-l);
+    }
+
+    .skill-header {
+      padding: var(--space-m);
+      margin-bottom: var(--space-l);
+    }
+
+    .skill-header::after {
+      display: none;
+    }
+
+    .meta-bar {
+      flex-direction: column;
+      gap: var(--space-xs);
+      font-size: 0.7rem;
+    }
+
+    .skill-title {
+      font-size: var(--step-2);
+    }
+
+    .skill-intro {
+      font-size: 0.9rem;
+      padding: var(--space-xs) var(--space-s);
+    }
+
     .content-header {
       flex-direction: column;
       gap: var(--space-s);
       align-items: flex-start;
+      padding: var(--space-s);
     }
-    
+
+    .tab {
+      font-size: 0.7rem;
+    }
+
     .copy-btn {
       width: 100%;
       text-align: center;
+      font-size: 0.7rem;
+    }
+
+    .skill-content {
+      padding: var(--space-m);
+      font-size: 0.95rem;
+    }
+
+    .back-link {
+      font-size: 0.8rem;
+      padding: var(--space-xs) var(--space-s);
     }
   }
+
+  @media (min-width: 601px) and (max-width: 900px) {
+    .skill-title {
+      font-size: var(--step-3);
+    }
+
+    .skill-content {
+      padding: var(--space-l);
+    }
+  }
+</style>
