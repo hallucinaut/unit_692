@@ -1,7 +1,6 @@
 ---
-import { getCollection } from 'astro:content';
+import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import MarkdownIt from 'markdown-it';
 
 export async function getStaticPaths() {
 	const skills = await getCollection('skills');
@@ -12,8 +11,7 @@ export async function getStaticPaths() {
 }
 
 const { skill } = Astro.props;
-const parser = new MarkdownIt({ html: true });
-const contentHtml = parser.render(skill.data.body || '');
+const { Content } = await render(skill);
 ---
 
 <BaseLayout title={skill.data.title} description={skill.data.description}>
@@ -34,7 +32,9 @@ const contentHtml = parser.render(skill.data.body || '');
         <span class="tab active">DIRECTIVE_TEXTUELLE</span>
         <button class="copy-btn" id="copy-button">COPIER_DIRECTIVE</button>
       </div>
-			<div class="skill-content" id="skill-text" set:html={contentHtml}></div>
+			<div class="skill-content" id="skill-text">
+				<Content />
+			</div>
 		</div>
     <a href="/skills" class="back-link">[RETOUR_AUX_MODULES]</a>
 	</article>
