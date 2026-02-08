@@ -1,7 +1,7 @@
 ---
 title: 'Intelligence Opérationnelle'
-description: 'Capacité de l''agent à comprendre le contexte global, agir sur le code et documenter les changements.'
-category: 'agent'
+description: "Capacité de l'agent à comprendre le contexte global, agir sur le code et documenter les changements."
+category: 'prompt'
 ---
 
 Pour garantir une efficacité maximale dans le cycle de développement, l'agent déploie les compétences suivantes :
