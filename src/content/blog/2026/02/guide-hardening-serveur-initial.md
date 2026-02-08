@@ -227,6 +227,46 @@ sudo dnf install rkhunter
 ```
 Lancez un scan manuel : `sudo rkhunter --check`.
 
+## 7. Le Coin des Sorciers (Commandes Cryptiques)
+
+Parce que parfois, une ligne de Bash vaut mille clics. Voici des commandes illisibles mais redoutables pour l'admin aguerri.
+
+**Tunnel SSH Inversé (Accès de secours) :**
+Ouvre un port sur votre machine locale qui redirige vers le SSH du serveur distant (utile derrière un NAT).
+```bash
+ssh -f -N -T -R 22222:localhost:22 user@votre-pc-externe
+```
+
+**Générateur de mot de passe paranoïaque :**
+Pas besoin de LastPass pour générer du chaos.
+```bash
+tr -dc 'A-Za-z0-9!@#$%^&*' </dev/urandom | head -c 32; echo
+```
+
+**Nettoyer les logs Docker (Quand /var explose) :**
+Une commande chirurgicale pour vider les logs JSON sans redémarrer les conteneurs.
+```bash
+truncate -s 0 /var/lib/docker/containers/*/*-json.log
+```
+
+**Espionner les connexions suspectes en temps réel :**
+Qui parle à qui ? (Nécessite `net-tools` ou `iproute2`)
+```bash
+ss -tunapl | awk '{print $5}' | cut -d: -f1 | sort | uniq -c | sort -nr | head
+```
+
+**Vérifier l'expiration d'un certificat SSL distant :**
+Sans navigateur, juste avec OpenSSL.
+```bash
+echo | openssl s_client -servername google.com -connect google.com:443 2>/dev/null | openssl x509 -noout -dates
+```
+
+**La Bombe Iptables (Bloquer une IP insistante) :**
+Bannissement immédiat et silencieux.
+```bash
+sudo iptables -I INPUT -s 192.168.1.50 -j DROP
+```
+
 ## Résumé du Protocole
 
 1.  Créer un utilisateur `sudo`.
