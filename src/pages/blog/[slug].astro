@@ -32,7 +32,6 @@ const description = post.data.description || post.data.excerpt;
 import MarkdownIt from 'markdown-it';
 const md = new MarkdownIt();
 const content = md.render(post.body);
-
 ---
 
 <BlogLayout title={title} description={description}>
@@ -50,7 +49,6 @@ const content = md.render(post.body);
 		<hr />
 
 		<div class="content" set:html={content} />
-	</article>
 
 		{post.data.tags?.length > 0 && (
 			<div class="tags">
@@ -71,7 +69,7 @@ const content = md.render(post.body);
 
 	<section class="sidebar">
 		<h3>Recent Posts</h3>
-		{postsData.map((p) => (
+		{sortedPostsData.map((p) => (
 			<a href={`/blog/${p.slug}/`}>
 				<h4>{p.data.title}</h4>
 				<time datetime={p.data.date.toISOString()}>
