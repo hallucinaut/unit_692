@@ -1,0 +1,9 @@
+{
+  "name": "My Astro Blog",
+  "short_name": "MyBlog",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#000000",
+  "description": "A fast, content-focused blog built with Astro"
+}

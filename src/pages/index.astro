@@ -1,17 +1,61 @@
 ---
+import { getCollection } from 'astro:content';
+import BlogLayout from '../layouts/BlogLayout.astro';
 
+// Get all blog posts sorted by date (newest first)
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.date.valueOf() - a.data.date.valueOf()
+);
+
+// Get the latest 3 posts for the homepage
+const featuredPosts = posts.slice(0, 3);
+const allBlogPosts = posts.slice(3); // The rest for the blog listing
+
+const title = 'Home';
+const description = 'Welcome to my personal blog';
 ---
 
-<html lang="en">
-	<head>
-		<meta charset="utf-8" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<link rel="icon" href="/favicon.ico" />
-		<meta name="viewport" content="width=device-width" />
-		<meta name="generator" content={Astro.generator} />
-		<title>Astro</title>
-	</head>
-	<body>
-		<h1>Astro</h1>
-	</body>
-</html>
+<BlogLayout title={title} description={description}>
+	<section class="hero">
+		<h2>Welcome to My Blog</h2>
+		<p>Hi, I'm a developer passionate about technology and sharing knowledge.</p>
+	</section>
+
+	<section class="featured">
+		<h2>Featured Posts</h2>
+		{featuredPosts.map((post) => (
+			<article>
+				<a href={`/blog/${post.slug}/`}>
+					<h3>{post.data.title}</h3>
+					<time datetime={post.data.date.toISOString()}>
+						{post.data.date.toLocaleDateString('en-US', {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric',
+						})}
+					</time>
+				</a>
+				<p>{post.data.excerpt || 'Read more about this post...'}</p>
+			</article>
+		))}
+	</section>
+
+	<section class="recent">
+		<h2>Recent Posts</h2>
+		{allBlogPosts.map((post) => (
+			<article>
+				<a href={`/blog/${post.slug}/`}>
+					<h3>{post.data.title}</h3>
+					<time datetime={post.data.date.toISOString()}>
+						{post.data.date.toLocaleDateString('en-US', {
+							year: 'numeric',
+							month: 'long',
+							day: 'numeric',
+						})}
+					</time>
+				</a>
+			</article>
+		))}
+		<p><a href="/blog">View all posts →</a></p>
+	</section>
+</BlogLayout>
