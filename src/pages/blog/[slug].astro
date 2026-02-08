@@ -20,12 +20,19 @@ if (!post) {
 }
 
 // Get all posts for the sidebar/similar posts
-const postsData = (await getCollection('blog')).sort(
+const postsData = await getCollection('blog');
+const sortedPostsData = postsData.sort(
 	(a, b) => b.data.date.valueOf() - a.data.date.valueOf()
-).slice(0, 5); // Get the 5 most recent posts
+).slice(0, 5);
 
 const title = post.data.title;
 const description = post.data.description || post.data.excerpt;
+
+// Use a simple markdown renderer
+import MarkdownIt from 'markdown-it';
+const md = new MarkdownIt();
+const content = md.render(post.body);
+
 ---
 
 <BlogLayout title={title} description={description}>
@@ -42,9 +49,8 @@ const description = post.data.description || post.data.excerpt;
 
 		<hr />
 
-		<div class="content">
-			<div set:html={post.body} />
-		</div>
+		<div class="content" set:html={content} />
+	</article>
 
 		{post.data.tags?.length > 0 && (
 			<div class="tags">
