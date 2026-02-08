@@ -2,6 +2,15 @@
   "name": "blog",
   "type": "module",
   "version": "0.0.1",
+  "author": "hallucinaut",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/hallucinaut/unit_692.git"
+  },
+  "homepage": "https://agent.692.fr/",
+  "bugs": {
+    "url": "https://github.com/hallucinaut/unit_692/issues"
+  },
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
