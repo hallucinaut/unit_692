@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BlogLayout from '../layouts/BlogLayout.astro';
+import { formatDate } from '../lib/date';
 
 // Get all blog posts sorted by date (newest first)
 const posts = (await getCollection('blog')).sort(
@@ -22,11 +23,7 @@ const description = 'All my blog posts about technology, coding, and more.';
 					<h2>{post.data.title}</h2>
 				</a>
 				<time datetime={post.data.date.toISOString()}>
-					{post.data.date.toLocaleDateString('en-US', {
-						year: 'numeric',
-						month: 'long',
-						day: 'numeric',
-					})}
+					{formatDate(post.data.date)}
 				</time>
 				{post.data.tags?.length > 0 && (
 					<div>

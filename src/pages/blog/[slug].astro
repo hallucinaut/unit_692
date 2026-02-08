@@ -1,6 +1,7 @@
 ---
 import { getCollection } from 'astro:content';
 import BlogLayout from '../../layouts/BlogLayout.astro';
+import { formatDate, formatShortDate } from '../../lib/date';
 
 // Get all posts for static generation
 export async function getStaticPaths() {
@@ -19,7 +20,7 @@ if (!post) {
 }
 
 // Get all posts for the sidebar/similar posts
-const posts = (await getCollection('blog')).sort(
+const postsData = (await getCollection('blog')).sort(
 	(a, b) => b.data.date.valueOf() - a.data.date.valueOf()
 ).slice(0, 5); // Get the 5 most recent posts
 
@@ -36,11 +37,7 @@ const description = post.data.description || post.data.excerpt;
 			</p>
 		)}
 		<time datetime={post.data.date.toISOString()}>
-			{post.data.date.toLocaleDateString('en-US', {
-				year: 'numeric',
-				month: 'long',
-				day: 'numeric',
-			})}
+			{formatDate(post.data.date)}
 		</time>
 
 		<hr />
@@ -68,15 +65,11 @@ const description = post.data.description || post.data.excerpt;
 
 	<section class="sidebar">
 		<h3>Recent Posts</h3>
-		{posts.map((p) => (
+		{postsData.map((p) => (
 			<a href={`/blog/${p.slug}/`}>
 				<h4>{p.data.title}</h4>
 				<time datetime={p.data.date.toISOString()}>
-					{p.data.date.toLocaleDateString('en-US', {
-						year: 'numeric',
-						month: 'short',
-						day: 'numeric',
-					})}
+					{formatShortDate(p.data.date)}
 				</time>
 			</a>
 		))}

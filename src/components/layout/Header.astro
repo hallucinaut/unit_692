@@ -1,0 +1,26 @@
+---
+// Header.astro - Navigation header component
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="My Blog" description="">
+	<slot name="header" template:literal>
+		<header>
+			<h1><a href="/">My Blog</a></h1>
+			<nav>
+				<a href="/">Home</a>
+				<a href="/blog">Blog</a>
+			</nav>
+		</header>
+	</slot>
+	<slot name="main" template:literal>
+		<main>
+			<slot />
+		</main>
+	</slot>
+	<slot name="footer" template:literal>
+		<footer>
+			<p>&copy; {new Date().getFullYear()} My Blog. All rights reserved.</p>
+		</footer>
+	</slot>
+</BaseLayout>
