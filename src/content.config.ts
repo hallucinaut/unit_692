@@ -17,7 +17,7 @@ const skillsCollection = defineCollection({
 	schema: z.object({
 		title: z.string(),
 		description: z.string(),
-		category: z.enum(['prompt', 'workflow', 'script', 'tool']),
+		category: z.enum(['prompt', 'workflow', 'script', 'tool', 'security']),
 		language: z.string().default('markdown'),
 	}),
 });
