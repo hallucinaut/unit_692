@@ -43,7 +43,7 @@ const description = post.data.description || post.data.excerpt;
 		<hr />
 
 		<div class="content">
-			<slot />
+			<div set:html={post.body} />
 		</div>
 
 		{post.data.tags?.length > 0 && (
