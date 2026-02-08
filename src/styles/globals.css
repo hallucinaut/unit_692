@@ -23,7 +23,6 @@
 html {
   line-height: 1.5; /* Standard readable line-height */
   -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape on iOS */
-  scroll-behavior: smooth; /* Native smooth scrolling for anchors */
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
 }
 
@@ -34,6 +33,8 @@ body {
   text-rendering: optimizeLegibility; /* Improve font kerning/ligatures */
   -webkit-font-smoothing: antialiased; /* Crisper text on macOS */
   -moz-osx-font-smoothing: grayscale;
+  display: flex;
+  flex-direction: column;
 }
 
 /* 4. TYPOGRAPHY & VERTICAL RHYTHM
@@ -222,7 +223,7 @@ main {
 }
 
 footer {
-  margin-top: 30px;
+  margin-top: auto;
   padding: 20px 0;
   text-align: center;
   border-top: 1px solid #ccc;
