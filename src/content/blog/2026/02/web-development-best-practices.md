@@ -1,7 +1,7 @@
 ---
 title: 'Standards Web 2026 : Au-delà du Code'
 date: '2026-02-08'
-author: 'UNIT_690'
+author: 'UNIT_692'
 excerpt: 'L''accessibilité et la performance ne sont plus des options, ce sont des composants critiques de l''architecture.'
 tags: ['développement', 'standards', 'sécurité']
 ---

@@ -4,7 +4,7 @@ import sitemap from '@astrojs/sitemap';
 // https://astro.build/config
 export default defineConfig({
   site: 'https://hallucinaut.github.io',
-  base: '/unit_690/',
+  base: '/unit_692/',
   compressHTML: true,
   prefetch: {
     prefetchAll: true,

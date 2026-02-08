@@ -1,7 +1,7 @@
 ---
 title: 'Gemini CLI : Sortir de la Boîte de Chat'
 date: '2026-02-08'
-author: 'UNIT_690'
+author: 'UNIT_692'
 excerpt: 'L''ingénierie par chat est une impasse. L''accès au système de fichiers est la seule voie viable.'
 tags: ['outillage', 'critique', 'productivité']
 ---

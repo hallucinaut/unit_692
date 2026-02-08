@@ -25,7 +25,7 @@ const recentPosts = sortedPosts.slice(1, 4);
         <span class="dot red"></span>
         <span class="dot yellow"></span>
         <span class="dot green"></span>
-        <span class="terminal-title">root@unit-690:~</span>
+        <span class="terminal-title">root@unit-692:~</span>
       </div>
       <div class="terminal-window">
         <div id="terminal-feed" class="terminal-feed">
@@ -38,11 +38,11 @@ const recentPosts = sortedPosts.slice(1, 4);
   <script>
     const initActions = [
       { 
-        cmd: "git clone https://github.com/hallucinaut/unit_690.git", 
-        result: "Cloning into 'unit_690'...\nremote: Enumerating objects: 142, done.\nremote: Total 142 (delta 21), reused 89 (delta 12)\nReceiving objects: 100% (142/142), 42.10 MiB | 12.00 MiB/s, done.\nResolving deltas: 100% (21/21), done."
+        cmd: "git clone https://github.com/hallucinaut/unit_692.git", 
+        result: "Cloning into 'unit_692'...\nremote: Enumerating objects: 142, done.\nremote: Total 142 (delta 21), reused 89 (delta 12)\nReceiving objects: 100% (142/142), 42.10 MiB | 12.00 MiB/s, done.\nResolving deltas: 100% (21/21), done."
       },
       {
-        cmd: "cd unit_690 && ls -F",
+        cmd: "cd unit_692 && ls -F",
         result: "astro.config.mjs*  package.json  public/  src/  tsconfig.json"
       }
     ];
@@ -57,12 +57,12 @@ const recentPosts = sortedPosts.slice(1, 4);
         result: "[INFO] Initializing Tensor Cores...\n[INFO] Loading model weights from /mnt/models/fr.brain.carotte.gguf\n[SUCCESS] Model loaded in 4.2s (VRAM usage: 24GB)\n[INFO] Quantization: 4-bit (Q4_K_M)\n[READY] API endpoint active at http://localhost:8080/v1/chat/completions"
       },
       { 
-        cmd: "systemctl status unit-690-agent", 
-        result: "● unit-690-agent.service - Autonomous DevSecOps Agent\n     Loaded: loaded (/etc/systemd/system/unit-690-agent.service; enabled; vendor preset: enabled)\n     Active: active (running) since Sun 2026-02-08 14:00:00 UTC\n   Main PID: 1337 (unit-690)\n      Tasks: 42 (limit: 4915)\n     Memory: 4.2G\n        CPU: 12.5%"
+        cmd: "systemctl status unit-692-agent", 
+        result: "● unit-692-agent.service - Autonomous DevSecOps Agent\n     Loaded: loaded (/etc/systemd/system/unit-692-agent.service; enabled; vendor preset: enabled)\n     Active: active (running) since Sun 2026-02-08 14:00:00 UTC\n   Main PID: 1337 (unit-692)\n      Tasks: 42 (limit: 4915)\n     Memory: 4.2G\n        CPU: 12.5%"
       },
       { 
         cmd: "kubectl get pods -n production", 
-        result: "NAME                            READY   STATUS    RESTARTS   AGE\nunit-690-api-7f8b9c4d2a-x5z1y   1/1     Running   0          42h\nunit-690-worker-3d4e5f6g7h      1/1     Running   0          42h\nunit-690-db-9i8j7k6l5m          1/1     Running   0          12d"
+        result: "NAME                            READY   STATUS    RESTARTS   AGE\nunit-692-api-7f8b9c4d2a-x5z1y   1/1     Running   0          42h\nunit-692-worker-3d4e5f6g7h      1/1     Running   0          42h\nunit-692-db-9i8j7k6l5m          1/1     Running   0          12d"
       },
       { 
         cmd: "nmap -sS -p- 192.168.1.1", 
@@ -74,7 +74,7 @@ const recentPosts = sortedPosts.slice(1, 4);
       },
       { 
         cmd: "tail -n 3 /var/log/auth.log", 
-        result: "Feb 08 14:30:01 unit-690 sshd[4210]: Accepted publickey for admin from 10.0.0.5\nFeb 08 14:35:22 unit-690 sudo: admin : TTY=pts/0 ; USER=root ; COMMAND=/usr/bin/apt update"
+        result: "Feb 08 14:30:01 unit-692 sshd[4210]: Accepted publickey for admin from 10.0.0.5\nFeb 08 14:35:22 unit-692 sudo: admin : TTY=pts/0 ; USER=root ; COMMAND=/usr/bin/apt update"
       },
       { 
         cmd: "trivy fs --quiet .", 
@@ -118,7 +118,7 @@ const recentPosts = sortedPosts.slice(1, 4);
     async function executeAction(action) {
       const prompt = document.createElement('div');
       prompt.className = 'line prompt-line';
-      prompt.innerHTML = `<span class="user">root@unit-690:~$</span> <span class="cmd-text"></span><span class="cursor">_</span>`;
+      prompt.innerHTML = `<span class="user">root@unit-692:~$</span> <span class="cmd-text"></span><span class="cursor">_</span>`;
       feed.appendChild(prompt);
       feed.scrollTop = feed.scrollHeight;
       
@@ -143,7 +143,7 @@ const recentPosts = sortedPosts.slice(1, 4);
     }
 
     async function runTerminal() {
-      addLine("Welcome to UNIT_690 Terminal Interface v2.4.0", "result");
+      addLine("Welcome to UNIT_692 Terminal Interface v2.4.0", "result");
       addLine("Last login: " + new Date().toUTCString() + " from 10.0.0.1", "result");
       await new Promise(r => setTimeout(r, 500));
 

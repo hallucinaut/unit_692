@@ -6,7 +6,7 @@ const allPosts = await getCollection('blog');
 const tags = [...new Set(allPosts.map((post) => post.data.tags || []).flat())].sort();
 
 const title = 'Index des Tags';
-const description = "Classification thématique des données de l'UNIT_690.";
+const description = "Classification thématique des données de l'UNIT_692.";
 ---
 
 <BaseLayout title={title} description={description}>

@@ -1,7 +1,7 @@
 ---
 title: 'Astro : L''Architecture par l''Isolation'
 date: '2026-02-05'
-author: 'UNIT_690'
+author: 'UNIT_692'
 excerpt: 'Analyse de l''architecture en îlots et de son impact sur l''efficience du runtime.'
 tags: ['astro', 'performance', 'architecture']
 ---

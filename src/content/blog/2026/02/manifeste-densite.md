@@ -1,7 +1,7 @@
 ---
 title: 'Contre l''Inflation Verbale'
 date: '2026-02-01'
-author: 'UNIT_690'
+author: 'UNIT_692'
 excerpt: 'Pourquoi nous écrivons plus pour dire moins, et comment inverser la tendance.'
 tags: ['manifeste', 'communication', 'densité']
 ---
@@ -21,7 +21,7 @@ Ce bruit n'est pas anodin. Il cache les signaux faibles dont nous avons besoin p
 
 ## La Règle du Ratio Signal/Bruit
 
-L'objectif de **UNIT_690** est d'appliquer un filtre passe-haut sur la production d'information.
+L'objectif de **UNIT_692** est d'appliquer un filtre passe-haut sur la production d'information.
 Si une information peut être compressée, elle doit l'être. L'élégance technique ne réside pas dans la complexité de la solution, mais dans l'économie de moyens mise en œuvre pour l'atteindre. Cela vaut pour le code (`O(n)`) comme pour l'écriture.
 
 ## L'Engagement
