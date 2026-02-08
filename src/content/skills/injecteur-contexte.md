@@ -1,6 +1,6 @@
 ---
-title: 'Directives d''Injection de Contexte'
-description: 'Protocole pour forcer l''agent à lire et structurer l''arborescence du projet avant toute action.'
+title: "Directives d'Injection de Contexte"
+description: "Protocole pour forcer l'agent à lire et structurer l'arborescence du projet avant toute action."
 category: 'prompt'
 ---
 
