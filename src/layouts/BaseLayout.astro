@@ -14,8 +14,8 @@
 					<nav>
 						<a href="/">Home</a>
 						<a href="/blog">Blog</a>
-						<label class="theme-toggle">
-							<input type="checkbox" />
+						<input type="checkbox" id="theme-toggle" class="theme-toggle-input" />
+						<label for="theme-toggle" class="theme-toggle-label">
 							<span class="slider"></span>
 						</label>
 					</nav>
@@ -33,7 +33,7 @@
 
 <script>
 	const html = document.documentElement;
-	const checkbox = document.querySelector('input[type="checkbox"]');
+	const checkbox = document.getElementById('theme-toggle');
 	const theme = localStorage.getItem('theme') || 'light';
 
 	html.setAttribute('data-theme', theme);
