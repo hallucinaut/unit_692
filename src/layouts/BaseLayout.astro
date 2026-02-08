@@ -16,8 +16,19 @@ const { title = 'Superposition', description = '' } = Astro.props;
 		<title>{title} | Superposition</title>
 	</head>
 	<body>
-		<slot name="header" />
-		<slot name="main" />
-		<slot name="footer" />
+		<header>
+			<div class="container">
+				<h1><a href="/">Superposition</a></h1>
+				<nav>
+					<a href="/">Home</a>
+					<a href="/blog">Blog</a>
+				</nav>
+			</div>
+		</header>
+		<main class="container">
+			<slot name="header" />
+			<slot name="main" />
+			<slot name="footer" />
+		</main>
 	</body>
 </html>

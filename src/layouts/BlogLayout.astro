@@ -18,19 +18,23 @@ const { title, description } = Astro.props;
 	</head>
 	<body>
 		<header>
-			<h1><a href="/">Superposition</a></h1>
-			<nav>
-				<a href="/">Home</a>
-				<a href="/blog">Blog</a>
-			</nav>
+			<div class="container">
+				<h1><a href="/">Superposition</a></h1>
+				<nav>
+					<a href="/">Home</a>
+					<a href="/blog">Blog</a>
+				</nav>
+			</div>
 		</header>
 
-		<main>
+		<main class="container">
 			<slot />
 		</main>
 
 		<footer>
-			<p>&copy; {new Date().getFullYear()} Superposition. All rights reserved.</p>
+			<div class="container">
+				<p>&copy; {new Date().getFullYear()} Superposition. All rights reserved.</p>
+			</div>
 		</footer>
 	</body>
 </html>

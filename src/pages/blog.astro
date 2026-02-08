@@ -26,7 +26,7 @@ const description = 'All my blog posts about technology, coding, and more.';
 					{formatDate(post.data.date)}
 				</time>
 				{post.data.tags?.length > 0 && (
-					<div>
+					<div class="tags">
 						<span>Tags:</span>{' '}
 						{post.data.tags.map((tag) => (
 							<a href={`/blog/tag/${tag}/`}>{tag}</a>
