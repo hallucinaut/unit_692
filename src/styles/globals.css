@@ -1,44 +1,41 @@
 /* ==========================================================================
    MODERN CSS3 BASE / RESET / NORMALIZATION
-   "God Mode" - The complete foundation.
    ========================================================================== */
 
-/* 1. GLOBAL BOX SIZING & DEFAULTS
-   -------------------------------------------------------------------------- */
+/* 1. GLOBAL BOX SIZING & DEFAULTS */
 *, *::before, *::after {
-  box-sizing: border-box; /* The holy grail of layout sanity */
+  box-sizing: border-box;
 }
 
-/* 2. ROOT CONFIGURATION
-   -------------------------------------------------------------------------- */
+/* 2. ROOT CONFIGURATION */
 :root {
   -moz-tab-size: 4;
   tab-size: 4;
-  /* Allows browsers to use native UI (dark/light) adjustments */
   color-scheme: light dark;
 }
 
-/* 3. HTML & BODY SETUP
-   -------------------------------------------------------------------------- */
+/* 3. HTML & BODY SETUP */
 html {
-  line-height: 1.5; /* Standard readable line-height */
-  -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape on iOS */
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
   font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
+  scroll-behavior: auto;
 }
 
 body {
-  margin: 0; /* Remove default browser margin */
-  min-height: 100vh; /* Ensure body always fills the viewport */
+  margin: 0;
+  min-height: 100vh;
   line-height: inherit;
-  text-rendering: optimizeLegibility; /* Improve font kerning/ligatures */
-  -webkit-font-smoothing: antialiased; /* Crisper text on macOS */
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  background: #fff;
+  color: #000;
   display: flex;
   flex-direction: column;
 }
 
-/* 4. TYPOGRAPHY & VERTICAL RHYTHM
-   -------------------------------------------------------------------------- */
+/* 4. TYPOGRAPHY */
 h1, h2, h3, h4, h5, h6 {
   font-size: inherit;
   font-weight: inherit;
@@ -47,10 +44,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 p, h1, h2, h3, h4, h5, h6 {
-  overflow-wrap: break-word; /* Prevent long words from breaking layouts */
+  overflow-wrap: break-word;
 }
 
-/* Fix 'sub' and 'sup' affecting line-height */
 sub, sup {
   font-size: 0.75em;
   line-height: 0;
@@ -60,55 +56,47 @@ sub, sup {
 sub { bottom: -0.25em; }
 sup { top: -0.5em; }
 
-/* Inherit decoration for consistency */
 a {
   color: inherit;
   text-decoration: inherit;
-  text-decoration-skip-ink: auto; /* Better underlining */
+  text-decoration-skip-ink: auto;
 }
 
-/* Preformatted text should wrap to prevent overflow */
 pre {
   white-space: pre-wrap;
 }
 
-/* 5. LISTS
-   -------------------------------------------------------------------------- */
-/* Remove list styles on ul/ol with a class attribute (assumed to be a component) */
+/* 5. LISTS */
 ul[class], ol[class] {
   list-style: none;
   padding: 0;
   margin: 0;
 }
-/* Standardize generic lists */
+
 ul, ol, dd {
   margin-top: 0;
   margin-bottom: 0;
 }
 
-/* 6. MEDIA (IMAGES, VIDEO, SVG)
-   -------------------------------------------------------------------------- */
+/* 6. MEDIA */
 img, picture, video, canvas, svg, iframe, object {
-  display: block; /* Removes the bottom gap in inline elements */
-  max-width: 100%; /* Prevents overflow */
+  display: block;
+  max-width: 100%;
 }
 
 img {
-  height: auto; /* Maintains aspect ratio */
-  font-style: italic; /* Style the alt text if image is broken */
+  height: auto;
+  font-style: italic;
   background-repeat: no-repeat;
   background-size: cover;
   shape-margin: 0.75rem;
 }
 
-/* SVG specific */
 svg {
-  fill: currentColor; /* Makes icons inherit text color */
+  fill: currentColor;
 }
 
-/* 7. FORMS & INTERACTIVE ELEMENTS (The Tricky Part)
-   -------------------------------------------------------------------------- */
-/* Reset fonts for all form elements */
+/* 7. FORMS */
 input, button, textarea, select, optgroup {
   font-family: inherit;
   font-size: 100%;
@@ -117,12 +105,10 @@ input, button, textarea, select, optgroup {
   color: inherit;
 }
 
-/* Normalize buttons */
 button, select {
   text-transform: none;
 }
 
-/* Ensure buttons and inputs are clickable */
 button, [type="button"], [type="reset"], [type="submit"] {
   -webkit-appearance: button;
   appearance: button;
@@ -131,29 +117,25 @@ button, [type="button"], [type="reset"], [type="submit"] {
   border-style: solid;
 }
 
-/* Fix Firefox focus ring */
 ::-moz-focus-inner {
   border-style: none;
   padding: 0;
 }
 
-/* Restore focus styles if they were unset */
 :-moz-focusring {
   outline: 1px dotted ButtonText;
 }
 
-/* Textarea standardization */
 textarea {
-  resize: vertical; /* Prevent horizontal resizing breaking layout */
+  resize: vertical;
   display: block;
 }
 
-/* Fieldset reset */
 fieldset {
   padding: 0;
   margin: 0;
   border: 0;
-  min-width: 0; /* Fix flexbox overflow issues */
+  min-width: 0;
 }
 
 legend {
@@ -163,36 +145,30 @@ legend {
   display: block;
 }
 
-/* 8. TABLES
-   -------------------------------------------------------------------------- */
+/* 8. TABLES */
 table {
-  border-collapse: collapse; /* Merges borders */
+  border-collapse: collapse;
   border-spacing: 0;
   width: 100%;
   text-indent: 0;
   border-color: inherit;
 }
 
-/* 9. HTML5 NEW ELEMENTS & UTILITIES
-   -------------------------------------------------------------------------- */
-/* Standardize the HTML5 dialog */
+/* 9. HTML5 */
 dialog {
   padding: 0;
 }
 
-/* Add support for the hidden attribute */
 [hidden] {
   display: none !important;
 }
 
-/* Summary/Details pointer */
 summary {
   display: list-item;
   cursor: pointer;
 }
 
-/* 10. ACCESSIBILITY (REDUCED MOTION)
-   -------------------------------------------------------------------------- */
+/* 10. ACCESSIBILITY */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
@@ -202,126 +178,25 @@ summary {
   }
 }
 
-/* CUSTOM STYLES
-   -------------------------------------------------------------------------- */
-html {
-  scroll-behavior: auto;
-}
-
-body {
-  background: #fff;
-  color: #000;
-}
-
-.container {
-  width: 800px;
-  margin: 0 auto;
-}
-
-main {
-  flex: 1;
-}
-
-footer {
-  margin-top: auto;
-  padding: 20px 0;
-  text-align: center;
-  border-top: 1px solid #ccc;
-}
-
-h1 { font-size: 2rem; }
-h2 { font-size: 1.5rem; }
-h3 { font-size: 1.25rem; }
-
-p { margin-bottom: 10px; }
-
-a { text-decoration: underline; }
-
-article {
-  margin-bottom: 20px;
-  padding: 15px;
-  border: 1px solid #000;
-}
-
-.tags {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-  margin-bottom: 10px;
-}
-
-.tags a { text-decoration: none; }
-
-nav {
-  display: flex;
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-nav a { text-decoration: none; }
-
-time { font-size: 0.8rem; }
-
-.content {
-  margin: 15px 0;
-}
-
-.content h2 { margin-top: 20px; }
-.content h3 { margin-top: 15px; }
-.content ul, .content ol { margin-bottom: 10px; padding-left: 2rem; }
-.content code {
-  font-family: monospace;
-  background: #f0f0f0;
-  padding: 2px 4px;
-}
-
-.content pre {
-  background: #f0f0f0;
-  padding: 10px;
-  overflow-x: auto;
-}
-
-@media (max-width: 600px) {
-  body { padding: 10px; }
-  .container { width: 100%; padding: 0 10px; }
-  h1 { font-size: 1.5rem; }
-  h2 { font-size: 1.25rem; }
-  h3 { font-size: 1rem; }
-  article { padding: 10px; }
-}
-
-@media (min-width: 601px) and (max-width: 900px) {
-  .container { padding: 0 20px; }
-}
-
-@media (min-width: 901px) {
-  .container { padding: 0 40px; }
-}
-
-/* Theme Variables */
+/* THEME */
 [data-theme="dark"] {
-  --bg: #000;
-  --text: #fff;
-  --border: #333;
-  --container-bg: #0a0a0a;
+  --bg: #050505;
+  --card: #0f0f0f;
+  --fg: #ffffff;
+  --dim: #525252;
+  --border: rgba(255, 255, 255, 0.08);
+  --shadow-color: #000;
+  --accent-glow: rgba(255, 255, 255, 0.2);
 }
 
 [data-theme="light"] {
-  --bg: #fff;
-  --text: #000;
-  --border: #ccc;
-  --container-bg: #fff;
-}
-
-/* Theme Button */
-.theme-toggle {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 5px 15px;
-  cursor: pointer;
-  margin-left: 15px;
-  font-size: 0.875rem;
+  --bg: #f4f4f5;
+  --card: #ffffff;
+  --fg: #09090b;
+  --dim: #a1a1aa;
+  --border: rgba(0, 0, 0, 0.1);
+  --shadow-color: rgba(0,0,0,0.1);
+  --accent-glow: rgba(0, 0, 0, 0.1);
 }
 
 [data-theme="dark"] body,
@@ -333,7 +208,7 @@ time { font-size: 0.8rem; }
 [data-theme="dark"] a,
 [data-theme="dark"] time {
   background: var(--bg);
-  color: var(--text);
+  color: var(--fg);
 }
 
 [data-theme="dark"] article,
@@ -352,7 +227,7 @@ time { font-size: 0.8rem; }
 
 [data-theme="dark"] .tags a {
   background: #222;
-  color: var(--text);
+  color: var(--fg);
 }
 
 [data-theme="dark"] footer {
@@ -368,7 +243,7 @@ time { font-size: 0.8rem; }
 [data-theme="light"] a,
 [data-theme="light"] time {
   background: var(--bg);
-  color: var(--text);
+  color: var(--fg);
 }
 
 [data-theme="light"] article,
@@ -394,39 +269,24 @@ time { font-size: 0.8rem; }
   border-color: var(--border);
 }
 
-/* Header Layout */
-.header-content {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
+/* CONTAINER */
+.container {
+  width: 800px;
+  margin: 0 auto;
 }
 
-nav {
-  display: flex;
-  gap: 15px;
-  align-items: center;
+main {
+  flex: 1;
 }
 
-@media (max-width: 600px) {
-  .header-content {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  nav {
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-  }
-
-  nav a,
-  .theme-toggle {
-    width: 100%;
-    text-align: center;
-  }
+footer {
+  margin-top: auto;
+  padding: 20px 0;
+  text-align: center;
+  border-top: 1px solid #ccc;
 }
 
-/* Header Layout */
+/* HEADER */
 .header-content {
   display: flex;
   justify-content: space-between;
@@ -440,166 +300,7 @@ nav {
   align-items: center;
 }
 
-.theme-toggle {
-  background: transparent;
-  border: 1px solid var(--border);
-  color: var(--text);
-  padding: 8px 12px;
-  cursor: pointer;
-  font-size: 1.25rem;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  margin: 0;
-}
-
-@media (max-width: 600px) {
-  .header-content {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  nav {
-    flex-direction: column;
-    gap: 10px;
-    width: 100%;
-  }
-
-  nav a,
-  .theme-toggle {
-    width: 100%;
-    text-align: center;
-  }
-}
-
-/* Theme Variables */
-[data-theme="dark"] {
-  --bg: #050505;
-  --card: #0f0f0f;
-  --fg: #ffffff;
-  --dim: #525252;
-  --border: rgba(255, 255, 255, 0.08);
-  --shadow-color: #000;
-  --accent-glow: rgba(255, 255, 255, 0.2);
-}
-
-[data-theme="light"] {
-  --bg: #f4f4f5;
-  --card: #ffffff;
-  --fg: #09090b;
-  --dim: #a1a1aa;
-  --border: rgba(0, 0, 0, 0.1);
-  --shadow-color: rgba(0,0,0,0.1);
-  --accent-glow: rgba(0, 0, 0, 0.1);
-}
-
-/* Toggle Switch */
-.theme-toggle {
-  display: inline-block;
-  position: relative;
-  width: 50px;
-  height: 24px;
-}
-
-.theme-toggle input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.theme-toggle .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--border);
-  transition: 0.4s;
-  border: 1px solid var(--border);
-}
-
-.theme-toggle .slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 3px;
-  bottom: 3px;
-  background-color: var(--fg);
-  transition: 0.4s;
-  border-radius: 50%;
-}
-
-.theme-toggle input:checked + .slider {
-  background-color: var(--card);
-}
-
-.theme-toggle input:checked + .slider:before {
-  transform: translateX(26px);
-}
-
-/* Theme Variables */
-[data-theme="dark"] {
-  --bg: #050505;
-  --card: #0f0f0f;
-  --fg: #ffffff;
-  --dim: #525252;
-  --border: rgba(255, 255, 255, 0.08);
-  --shadow-color: #000;
-  --accent-glow: rgba(255, 255, 255, 0.2);
-}
-
-[data-theme="light"] {
-  --bg: #f4f4f5;
-  --card: #ffffff;
-  --fg: #09090b;
-  --dim: #a1a1aa;
-  --border: rgba(0, 0, 0, 0.1);
-  --shadow-color: rgba(0,0,0,0.1);
-  --accent-glow: rgba(0, 0, 0, 0.1);
-}
-
-/* Toggle Switch */
-.theme-toggle input {
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.theme-toggle .slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: var(--border);
-  transition: 0.4s;
-  border: 1px solid var(--border);
-}
-
-.theme-toggle .slider:before {
-  position: absolute;
-  content: "";
-  height: 16px;
-  width: 16px;
-  left: 3px;
-  bottom: 3px;
-  background-color: var(--fg);
-  transition: 0.4s;
-  border-radius: 50%;
-}
-
-.theme-toggle input:checked + .slider {
-  background-color: var(--card);
-}
-
-.theme-toggle input:checked + .slider:before {
-  transform: translateX(26px);
-}
-
-/* Toggle Switch */
+/* TOGGLE SWITCH */
 .theme-toggle-input {
   display: none;
 }
@@ -641,4 +342,72 @@ nav {
 
 .theme-toggle-input:checked + .theme-toggle-label .slider:before {
   transform: translateX(26px);
+}
+
+/* CONTENT */
+.content {
+  margin: 15px 0;
+}
+
+.content h2 { margin-top: 20px; }
+.content h3 { margin-top: 15px; }
+.content ul, .content ol { margin-bottom: 10px; padding-left: 2rem; }
+.content code {
+  font-family: monospace;
+  background: #f0f0f0;
+  padding: 2px 4px;
+}
+
+.content pre {
+  background: #f0f0f0;
+  padding: 10px;
+  overflow-x: auto;
+}
+
+/* TAGS */
+.tags {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
+}
+
+.tags a {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* RESPONSIVE */
+@media (max-width: 600px) {
+  body { padding: 10px; }
+  .container { width: 100%; padding: 0 10px; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
+  h3 { font-size: 1rem; }
+  article { padding: 10px; }
+
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  nav a,
+  .theme-toggle-label {
+    width: 100%;
+    text-align: center;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 900px) {
+  .container { padding: 0 20px; }
+}
+
+@media (min-width: 901px) {
+  .container { padding: 0 40px; }
 }
