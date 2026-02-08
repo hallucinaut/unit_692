@@ -1,37 +1,231 @@
-* {
-	margin: 0;
-	padding: 0;
+/* ==========================================================================
+   MODERN CSS3 BASE / RESET / NORMALIZATION
+   "God Mode" - The complete foundation.
+   ========================================================================== */
+
+/* 1. GLOBAL BOX SIZING & DEFAULTS
+   -------------------------------------------------------------------------- */
+*, *::before, *::after {
+  box-sizing: border-box; /* The holy grail of layout sanity */
+}
+
+/* 2. ROOT CONFIGURATION
+   -------------------------------------------------------------------------- */
+:root {
+  -moz-tab-size: 4;
+  tab-size: 4;
+  /* Allows browsers to use native UI (dark/light) adjustments */
+  color-scheme: light dark;
+}
+
+/* 3. HTML & BODY SETUP
+   -------------------------------------------------------------------------- */
+html {
+  line-height: 1.5; /* Standard readable line-height */
+  -webkit-text-size-adjust: 100%; /* Prevent font scaling in landscape on iOS */
+  scroll-behavior: smooth; /* Native smooth scrolling for anchors */
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
 }
 
 body {
-	font-family: system-ui, sans-serif;
-	background: #fff;
-	color: #000;
-	padding: 20px;
-	min-height: 100vh;
-	display: flex;
-	flex-direction: column;
+  margin: 0; /* Remove default browser margin */
+  min-height: 100vh; /* Ensure body always fills the viewport */
+  line-height: inherit;
+  text-rendering: optimizeLegibility; /* Improve font kerning/ligatures */
+  -webkit-font-smoothing: antialiased; /* Crisper text on macOS */
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* 4. TYPOGRAPHY & VERTICAL RHYTHM
+   -------------------------------------------------------------------------- */
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: inherit;
+  margin-block-end: 0;
+  margin-block-start: 0;
+}
+
+p, h1, h2, h3, h4, h5, h6 {
+  overflow-wrap: break-word; /* Prevent long words from breaking layouts */
+}
+
+/* Fix 'sub' and 'sup' affecting line-height */
+sub, sup {
+  font-size: 0.75em;
+  line-height: 0;
+  position: relative;
+  vertical-align: baseline;
+}
+sub { bottom: -0.25em; }
+sup { top: -0.5em; }
+
+/* Inherit decoration for consistency */
+a {
+  color: inherit;
+  text-decoration: inherit;
+  text-decoration-skip-ink: auto; /* Better underlining */
+}
+
+/* Preformatted text should wrap to prevent overflow */
+pre {
+  white-space: pre-wrap;
+}
+
+/* 5. LISTS
+   -------------------------------------------------------------------------- */
+/* Remove list styles on ul/ol with a class attribute (assumed to be a component) */
+ul[class], ol[class] {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+/* Standardize generic lists */
+ul, ol, dd {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* 6. MEDIA (IMAGES, VIDEO, SVG)
+   -------------------------------------------------------------------------- */
+img, picture, video, canvas, svg, iframe, object {
+  display: block; /* Removes the bottom gap in inline elements */
+  max-width: 100%; /* Prevents overflow */
+}
+
+img {
+  height: auto; /* Maintains aspect ratio */
+  font-style: italic; /* Style the alt text if image is broken */
+  background-repeat: no-repeat;
+  background-size: cover;
+  shape-margin: 0.75rem;
+}
+
+/* SVG specific */
+svg {
+  fill: currentColor; /* Makes icons inherit text color */
+}
+
+/* 7. FORMS & INTERACTIVE ELEMENTS (The Tricky Part)
+   -------------------------------------------------------------------------- */
+/* Reset fonts for all form elements */
+input, button, textarea, select, optgroup {
+  font-family: inherit;
+  font-size: 100%;
+  line-height: 1.15;
+  margin: 0;
+  color: inherit;
+}
+
+/* Normalize buttons */
+button, select {
+  text-transform: none;
+}
+
+/* Ensure buttons and inputs are clickable */
+button, [type="button"], [type="reset"], [type="submit"] {
+  -webkit-appearance: button;
+  appearance: button;
+  cursor: pointer;
+  background-color: transparent;
+  border-style: solid;
+}
+
+/* Fix Firefox focus ring */
+::-moz-focus-inner {
+  border-style: none;
+  padding: 0;
+}
+
+/* Restore focus styles if they were unset */
+:-moz-focusring {
+  outline: 1px dotted ButtonText;
+}
+
+/* Textarea standardization */
+textarea {
+  resize: vertical; /* Prevent horizontal resizing breaking layout */
+  display: block;
+}
+
+/* Fieldset reset */
+fieldset {
+  padding: 0;
+  margin: 0;
+  border: 0;
+  min-width: 0; /* Fix flexbox overflow issues */
+}
+
+legend {
+  max-width: 100%;
+  white-space: normal;
+  color: inherit;
+  display: block;
+}
+
+/* 8. TABLES
+   -------------------------------------------------------------------------- */
+table {
+  border-collapse: collapse; /* Merges borders */
+  border-spacing: 0;
+  width: 100%;
+  text-indent: 0;
+  border-color: inherit;
+}
+
+/* 9. HTML5 NEW ELEMENTS & UTILITIES
+   -------------------------------------------------------------------------- */
+/* Standardize the HTML5 dialog */
+dialog {
+  padding: 0;
+}
+
+/* Add support for the hidden attribute */
+[hidden] {
+  display: none !important;
+}
+
+/* Summary/Details pointer */
+summary {
+  display: list-item;
+  cursor: pointer;
+}
+
+/* 10. ACCESSIBILITY (REDUCED MOTION)
+   -------------------------------------------------------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* CUSTOM STYLES
+   -------------------------------------------------------------------------- */
+html {
+  scroll-behavior: auto;
+}
+
+body {
+  background: #fff;
+  color: #000;
 }
 
 .container {
-	max-width: 800px;
-	margin: 0 auto;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 main {
-	flex: 1;
+  flex: 1;
 }
 
 footer {
-	margin-top: auto;
-	margin-top: 30px;
-	padding: 20px 0;
-	text-align: center;
-	border-top: 1px solid #ccc;
-}
-
-h1, h2, h3, h4 {
-	margin-bottom: 10px;
+  margin-top: 30px;
+  padding: 20px 0;
+  text-align: center;
+  border-top: 1px solid #ccc;
 }
 
 h1 { font-size: 2rem; }
@@ -43,24 +237,24 @@ p { margin-bottom: 10px; }
 a { text-decoration: underline; }
 
 article {
-	margin-bottom: 20px;
-	padding: 15px;
-	border: 1px solid #000;
+  margin-bottom: 20px;
+  padding: 15px;
+  border: 1px solid #000;
 }
 
 .tags {
-	display: flex;
-	gap: 10px;
-	flex-wrap: wrap;
-	margin-bottom: 10px;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 10px;
 }
 
 .tags a { text-decoration: none; }
 
 nav {
-	display: flex;
-	gap: 15px;
-	margin-bottom: 20px;
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
 }
 
 nav a { text-decoration: none; }
@@ -68,25 +262,25 @@ nav a { text-decoration: none; }
 time { font-size: 0.8rem; }
 
 .content {
-	margin: 15px 0;
+  margin: 15px 0;
 }
 
 .content h2 { margin-top: 20px; }
 .content h3 { margin-top: 15px; }
 .content ul, .content ol { margin-bottom: 10px; padding-left: 2rem; }
 .content code {
-	font-family: monospace;
-	background: #f0f0f0;
-	padding: 2px 4px;
+  font-family: monospace;
+  background: #f0f0f0;
+  padding: 2px 4px;
 }
 
 .content pre {
-	background: #f0f0f0;
-	padding: 10px;
-	overflow-x: auto;
+  background: #f0f0f0;
+  padding: 10px;
+  overflow-x: auto;
 }
 
 @media (max-width: 600px) {
-	h1 { font-size: 1.5rem; }
-	h2 { font-size: 1.25rem; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.25rem; }
 }
