@@ -49,9 +49,9 @@ Envoyez la clé publique vers le serveur :
 ssh-copy-id operateur@ip-du-serveur
 ```
 
-### B. Verrouiller la configuration
+### B. Verrouiller la configuration & Changer le Port
 
-Maintenant que votre clé est en place, nous allons dire au serveur de **refuser** tout mot de passe et de **bannir** la connexion root directe.
+Nous allons dire au serveur de refuser les mots de passe, de bannir root, et de **déplacer SSH sur un port non-standard** (ex: 2222). Cela réduit drastiquement les logs de tentatives de brute-force (les bots scannent surtout le 22).
 
 Éditez `/etc/ssh/sshd_config` :
 
@@ -59,7 +59,7 @@ Maintenant que votre clé est en place, nous allons dire au serveur de **refuser
 sudo nano /etc/ssh/sshd_config
 ```
 
-Modifiez (ou ajoutez) ces lignes :
+Modifiez ces lignes :
 
 ```ini
 # Désactiver l'accès root direct
@@ -68,12 +68,68 @@ PermitRootLogin no
 # Désactiver l'authentification par mot de passe (Clés UNIQUEMENT)
 PasswordAuthentication no
 
-# (Optionnel) Changer le port pour réduire le bruit dans les logs
-# Port 2222
+# Changer le port (choisissez un nombre entre 1024 et 65535)
+Port 2222
 ```
 
-Redémarrez le service SSH :
-`sudo systemctl restart ssh` (ou `sshd`).
+**⚠️ ATTENTION : Ne redémarrez pas SSH tout de suite !** Vous devez d'abord ouvrir le firewall, sinon vous serez enfermé dehors.
+
+### C. Ajuster le Firewall et SELinux (Critique)
+
+Si vous changez le port, vous devez prévenir le système.
+
+**1. Ouvrir le port dans le Firewall :**
+
+*   **Debian/Ubuntu (UFW) :**
+    ```bash
+    sudo ufw allow 2222/tcp
+    sudo ufw reload
+    ```
+*   **CentOS/RHEL (Firewalld) :**
+    ```bash
+    sudo firewall-cmd --permanent --add-port=2222/tcp
+    sudo firewall-cmd --reload
+    ```
+
+**2. Gérer SELinux (CentOS/RHEL uniquement) :**
+Si SELinux est actif (ce qui est recommandé), il bloquera SSH sur un port non-standard. Autorisez-le :
+```bash
+sudo dnf install policycoreutils-python-utils
+sudo semanage port -a -t ssh_port_t -p tcp 2222
+```
+
+**3. Redémarrer SSH :**
+Maintenant que la voie est libre, appliquez la config.
+```bash
+sudo systemctl restart sshd
+```
+
+### D. Comment se connecter au nouveau port ?
+
+Votre ancienne commande `ssh user@ip` ne fonctionnera plus (elle vise le port 22 par défaut).
+
+**Méthode manuelle :**
+```bash
+ssh -p 2222 operateur@ip-du-serveur
+```
+
+**Méthode automatique (recommandée) :**
+Créez un fichier `~/.ssh/config` sur votre **ordinateur local** :
+
+```bash
+nano ~/.ssh/config
+```
+
+Ajoutez-y :
+```ssh
+Host mon-serveur
+    HostName ip-du-serveur
+    User operateur
+    Port 2222
+    IdentityFile ~/.ssh/id_ed25519
+```
+
+Désormais, tapez simplement `ssh mon-serveur` pour vous connecter.
 
 **⚠️ IMPORTANT :** Ne fermez pas votre terminal actuel ! Ouvrez un nouveau terminal et testez la connexion. Si vous vous êtes trompé, vous gardez une session active pour réparer.
 
@@ -87,7 +143,8 @@ Un serveur ne doit exposer que ce qui est strictement nécessaire. Par défaut, 
 sudo apt install ufw
 sudo ufw default deny incoming
 sudo ufw default allow outgoing
-sudo ufw allow ssh  # ou le port personnalisé
+# Note : Si vous avez changé le port SSH à l'étape précédente,
+# assurez-vous qu'il est bien autorisé (ex: sudo ufw allow 2222/tcp)
 sudo ufw enable
 ```
 
@@ -98,11 +155,10 @@ Sur ces systèmes, `firewalld` est le standard.
 ```bash
 sudo systemctl enable --now firewalld
 
-# Autoriser SSH (déjà actif par défaut, mais pour confirmer)
-sudo firewall-cmd --permanent --add-service=ssh
-# Ou port personnalisé : sudo firewall-cmd --permanent --add-port=2222/tcp
+# Vérifiez vos ports ouverts
+sudo firewall-cmd --list-all
 
-# Recharger pour appliquer
+# Recharger pour appliquer si besoin
 sudo firewall-cmd --reload
 ```
 
@@ -142,6 +198,34 @@ sudo dnf install dnf-automatic
 sudo systemctl enable --now dnf-automatic.timer
 ```
 Par défaut, il télécharge. Pour qu'il installe, éditez `/etc/dnf/automatic.conf` et mettez `apply_updates = yes`.
+
+## 6. Bonus : Audit & Monitoring
+
+Sécuriser, c'est bien. Surveiller, c'est mieux.
+
+### Logwatch (Rapport quotidien)
+Cet outil analyse vos logs et vous envoie un résumé par mail chaque matin (tentatives SSH, erreurs sudo, espace disque).
+
+```bash
+# Debian/Ubuntu
+sudo apt install logwatch
+
+# CentOS/RHEL
+sudo dnf install logwatch
+```
+Configurez l'email de réception dans `/usr/share/logwatch/default.conf/logwatch.conf` (copiez-le dans `/etc/logwatch/conf/` avant modification).
+
+### Rkhunter (Chasseur de Rootkits)
+Il scanne le système à la recherche de fichiers modifiés ou de signatures de rootkits connus.
+
+```bash
+# Debian/Ubuntu
+sudo apt install rkhunter
+
+# CentOS/RHEL (via EPEL)
+sudo dnf install rkhunter
+```
+Lancez un scan manuel : `sudo rkhunter --check`.
 
 ## Résumé du Protocole
 
