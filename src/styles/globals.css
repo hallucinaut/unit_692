@@ -471,3 +471,70 @@ nav {
     text-align: center;
   }
 }
+
+/* Theme Variables */
+[data-theme="dark"] {
+  --bg: #050505;
+  --card: #0f0f0f;
+  --fg: #ffffff;
+  --dim: #525252;
+  --border: rgba(255, 255, 255, 0.08);
+  --shadow-color: #000;
+  --accent-glow: rgba(255, 255, 255, 0.2);
+}
+
+[data-theme="light"] {
+  --bg: #f4f4f5;
+  --card: #ffffff;
+  --fg: #09090b;
+  --dim: #a1a1aa;
+  --border: rgba(0, 0, 0, 0.1);
+  --shadow-color: rgba(0,0,0,0.1);
+  --accent-glow: rgba(0, 0, 0, 0.1);
+}
+
+/* Toggle Switch */
+.theme-toggle {
+  display: inline-block;
+  position: relative;
+  width: 50px;
+  height: 24px;
+}
+
+.theme-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.theme-toggle .slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--border);
+  transition: 0.4s;
+  border: 1px solid var(--border);
+}
+
+.theme-toggle .slider:before {
+  position: absolute;
+  content: "";
+  height: 16px;
+  width: 16px;
+  left: 3px;
+  bottom: 3px;
+  background-color: var(--fg);
+  transition: 0.4s;
+  border-radius: 50%;
+}
+
+.theme-toggle input:checked + .slider {
+  background-color: var(--card);
+}
+
+.theme-toggle input:checked + .slider:before {
+  transform: translateX(26px);
+}
