@@ -1,4 +1,4 @@
-<html lang="en">
+<html lang="en" data-theme="light">
 	<head>
 		<meta charset="utf-8" />
 		<link rel="icon" href="/favicon.ico" />
@@ -9,11 +9,14 @@
 	<body>
 		<header>
 			<div class="container">
-				<h1><a href="/">Superposition</a></h1>
-				<nav>
-					<a href="/">Home</a>
-					<a href="/blog">Blog</a>
-				</nav>
+				<div class="header-content">
+					<h1><a href="/">Superposition</a></h1>
+					<nav>
+						<a href="/">Home</a>
+						<a href="/blog">Blog</a>
+						<button class="theme-toggle" id="theme-toggle">Theme</button>
+					</nav>
+				</div>
 			</div>
 		</header>
 		<main class="container">
@@ -24,3 +27,18 @@
 		</footer>
 	</body>
 </html>
+
+<script>
+	const themeToggle = document.getElementById('theme-toggle');
+	const html = document.documentElement;
+	const theme = localStorage.getItem('theme') || 'light';
+
+	html.setAttribute('data-theme', theme);
+
+	themeToggle.addEventListener('click', () => {
+		const currentTheme = html.getAttribute('data-theme');
+		const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+		html.setAttribute('data-theme', newTheme);
+		localStorage.setItem('theme', newTheme);
+	});
+</script>

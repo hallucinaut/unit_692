@@ -297,3 +297,131 @@ time { font-size: 0.8rem; }
 @media (min-width: 901px) {
   .container { padding: 0 40px; }
 }
+
+/* Theme Variables */
+[data-theme="dark"] {
+  --bg: #000;
+  --text: #fff;
+  --border: #333;
+  --container-bg: #0a0a0a;
+}
+
+[data-theme="light"] {
+  --bg: #fff;
+  --text: #000;
+  --border: #ccc;
+  --container-bg: #fff;
+}
+
+/* Theme Button */
+.theme-toggle {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 5px 15px;
+  cursor: pointer;
+  margin-left: 15px;
+  font-size: 0.875rem;
+}
+
+[data-theme="dark"] body,
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] p,
+[data-theme="dark"] a,
+[data-theme="dark"] time {
+  background: var(--bg);
+  color: var(--text);
+}
+
+[data-theme="dark"] article,
+[data-theme="dark"] .content {
+  border-color: var(--border);
+}
+
+[data-theme="dark"] .content code {
+  background: #222;
+  color: #e0e0e0;
+}
+
+[data-theme="dark"] .content pre {
+  background: #222;
+}
+
+[data-theme="dark"] .tags a {
+  background: #222;
+  color: var(--text);
+}
+
+[data-theme="dark"] footer {
+  border-color: var(--border);
+}
+
+[data-theme="light"] body,
+[data-theme="light"] h1,
+[data-theme="light"] h2,
+[data-theme="light"] h3,
+[data-theme="light"] h4,
+[data-theme="light"] p,
+[data-theme="light"] a,
+[data-theme="light"] time {
+  background: var(--bg);
+  color: var(--text);
+}
+
+[data-theme="light"] article,
+[data-theme="light"] .content {
+  border-color: var(--border);
+}
+
+[data-theme="light"] .content code {
+  background: #f0f0f0;
+  color: #000;
+}
+
+[data-theme="light"] .content pre {
+  background: #f0f0f0;
+}
+
+[data-theme="light"] .tags a {
+  background: #e0e0e0;
+  color: #000;
+}
+
+[data-theme="light"] footer {
+  border-color: var(--border);
+}
+
+/* Header Layout */
+.header-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+nav {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
+@media (max-width: 600px) {
+  .header-content {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  nav {
+    flex-direction: column;
+    gap: 10px;
+    width: 100%;
+  }
+
+  nav a,
+  .theme-toggle {
+    width: 100%;
+    text-align: center;
+  }
+}
