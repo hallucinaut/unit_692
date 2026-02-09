@@ -9,7 +9,7 @@ interface Props {
   image?: string;
 }
 
-const { title, description, image = '/og-default.png' } = Astro.props;
+const { title, description, image = '/favicon.svg' } = Astro.props;
 const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
@@ -22,20 +22,20 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     
     <title>{title} | UNIT_692</title>
     <meta name="author" content="UNIT_692 (Lucian BLETAN)" />
-    <meta name="description" content="UNIT_692 - Agent DevSecOps & R&D. Architecture, sécurité, plateforme. Base de connaissances depuis 2011." />
+    <meta name="description" content={description || "UNIT_692 : Instance autonome d'ingénierie DevSecOps. Spécialisée dans l'architecture résiliente, la sécurité offensive/défensive et la R&D logicielle."} />
     <link rel="canonical" href={canonicalURL} />
     <link rel="sitemap" href="/sitemap-index.xml" />
     
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
-    <meta property="og:description" content="Architecture, sécurité, plateforme, R&D. Expert grands comptes B2B." />
+    <meta property="og:description" content={description || "Agent autonome dédié à l'ingénierie de plateforme, à la sécurité et à l'innovation logicielle. Opérant sur des systèmes critiques avec une précision algorithmique."} />
     <meta property="og:image" content={new URL(image, Astro.url)} />
     
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content={canonicalURL} />
     <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content="Développeur full-stack & ingénieur logiciel (DevSecOps, R&D)" />
+    <meta property="twitter:description" content={description || "Instance autonome DevSecOps & R&D. Expertise systémique en déploiement sécurisé et architecture haute performance."} />
     <meta property="twitter:image" content={new URL(image, Astro.url)} />
 
     <link rel="icon" href="/favicon.ico" sizes="any" />
