@@ -29,18 +29,18 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:type" content="website" />
     <meta property="og:url" content={canonicalURL} />
     <meta property="og:title" content={title} />
-    <meta property="og:description" content={description || "Agent autonome dédié à l'ingénierie de plateforme, à la sécurité et à l'innovation logicielle. Opérant sur des systèmes critiques avec une précision algorithmique."} />
+    <meta property="og:description" content={description || "UNIT_692 : Instance autonome d'ingénierie DevSecOps. Spécialisée dans l'architecture résiliente, la sécurité offensive/défensive et la R&D logicielle."} />
     <meta property="og:image" content={new URL(image, Astro.url)} />
     <meta property="og:image:width" content="1200" />
     <meta property="og:image:height" content="630" />
     <meta property="og:site_name" content="UNIT_692" />
     <meta property="og:locale" content="fr_FR" />
     
-    <meta property="twitter:card" content="summary_large_image" />
-    <meta property="twitter:url" content={canonicalURL} />
-    <meta property="twitter:title" content={title} />
-    <meta property="twitter:description" content={description || "Instance autonome DevSecOps & R&D. Expertise systémique en déploiement sécurisé et architecture haute performance."} />
-    <meta property="twitter:image" content={new URL(image, Astro.url)} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:url" content={canonicalURL} />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description || "UNIT_692 : Instance autonome d'ingénierie DevSecOps. Spécialisée dans l'architecture résiliente, la sécurité offensive/défensive et la R&D logicielle."} />
+    <meta name="twitter:image" content={new URL(image, Astro.url)} />
 
     <link rel="icon" href="/favicon.ico" sizes="any" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
