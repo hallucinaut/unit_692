@@ -60,6 +60,58 @@ const { Content } = await render(post);
 	</article>
 </BaseLayout>
 
+<script>
+  // Ajouter un bouton copier à chaque bloc de code
+  document.addEventListener('DOMContentLoaded', () => {
+    const codeBlocks = document.querySelectorAll('.post-content pre');
+
+    codeBlocks.forEach((pre) => {
+      // Créer un wrapper pour le positionnement relatif
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-block-wrapper';
+
+      // Wrapper le <pre> existant
+      pre.parentNode?.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+
+      // Créer le bouton copier
+      const copyBtn = document.createElement('button');
+      copyBtn.className = 'code-copy-btn';
+      copyBtn.innerHTML = 'COPIER';
+      copyBtn.setAttribute('aria-label', 'Copier le code');
+
+      // Ajouter le bouton au wrapper
+      wrapper.appendChild(copyBtn);
+
+      // Event listener pour copier
+      copyBtn.addEventListener('click', async () => {
+        const code = pre.querySelector('code') || pre;
+        const text = code.innerText;
+
+        try {
+          await navigator.clipboard.writeText(text);
+
+          // Feedback visuel
+          const originalText = copyBtn.innerHTML;
+          copyBtn.innerHTML = 'COPIÉ !';
+          copyBtn.classList.add('copied');
+
+          setTimeout(() => {
+            copyBtn.innerHTML = originalText;
+            copyBtn.classList.remove('copied');
+          }, 2000);
+        } catch (err) {
+          console.error('Erreur lors de la copie:', err);
+          copyBtn.innerHTML = 'ERREUR';
+          setTimeout(() => {
+            copyBtn.innerHTML = 'COPIER';
+          }, 2000);
+        }
+      });
+    });
+  });
+</script>
+
 <style>
   .grid-overlay {
     position: fixed;
@@ -211,18 +263,57 @@ const { Content } = await render(post);
     margin-block-start: var(--space-m);
   }
 
+  /* Wrapper pour les blocs de code avec bouton copier */
+  :global(.post-content .code-block-wrapper) {
+    position: relative;
+    margin-block: var(--space-m);
+  }
+
   :global(.post-content pre) {
     padding: var(--space-m);
+    padding-top: var(--space-l); /* Espace pour le bouton */
     border: 1px solid var(--border-color);
     background: #000;
     color: #e0e0e0;
     overflow-x: auto;
     font-family: var(--font-mono);
+    margin: 0; /* Reset margin car le wrapper gère l'espacement */
   }
-  
+
   :global(.post-content code) {
     font-family: var(--font-mono);
     color: var(--color-brand-2);
+  }
+
+  /* Bouton copier pour chaque bloc de code */
+  :global(.code-copy-btn) {
+    position: absolute;
+    top: var(--space-xs);
+    right: var(--space-xs);
+    background: transparent;
+    border: 1px solid var(--color-brand-1);
+    color: var(--color-brand-1);
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    font-weight: 600;
+    padding: var(--space-xs) var(--space-s);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    z-index: 10;
+  }
+
+  :global(.code-copy-btn:hover) {
+    background: var(--color-brand-1);
+    color: #000000;
+    box-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
+  }
+
+  :global(.code-copy-btn.copied) {
+    background: var(--color-brand-1);
+    color: #000000;
+    box-shadow: 0 0 10px rgba(88, 166, 255, 0.5);
   }
 
   :global(.post-content blockquote) {
@@ -272,6 +363,11 @@ const { Content } = await render(post);
     .post-content {
       padding: var(--space-m);
       font-size: 0.95rem;
+    }
+
+    :global(.code-copy-btn) {
+      font-size: 0.65rem;
+      padding: 0.25rem 0.5rem;
     }
   }
 </style>
