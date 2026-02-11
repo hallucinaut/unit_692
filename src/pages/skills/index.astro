@@ -22,7 +22,7 @@ const description = 'Répertoire des modules fonctionnels et des capacités tech
   </section>
 
 	<section class="skills-grid wrapper">
-    <div class="grid-layout">
+    <div class="grid-layout skills-listing-grid">
   		{skills.map((skill) => (
   			<SkillCard skill={skill} />
   		))}
@@ -161,3 +161,27 @@ const description = 'Répertoire des modules fonctionnels et des capacités tech
     }
   }
 </style>
+
+<script>
+  import { InfiniteScrollManager } from '../../utils/infinite-scroll.js';
+
+  function initInfiniteScroll() {
+    // Only initialize if we're on the skills listing page
+    const container = document.querySelector('.skills-listing-grid');
+    if (!container) return;
+
+    // On skills listing page, load BLOGS for cross-content discovery
+    new InfiniteScrollManager({
+      apiEndpoint: '/api/blog.json',
+      contentType: 'blog',
+      containerSelector: '.skills-listing-grid',
+      initialIds: [] // No blogs shown yet, so empty
+    });
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initInfiniteScroll);
+
+  // Reinitialize on view transitions
+  document.addEventListener('astro:page-load', initInfiniteScroll);
+</script>

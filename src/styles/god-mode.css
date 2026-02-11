@@ -227,3 +227,134 @@ body::after {
   z-index: 9999;
   opacity: 0.1; /* Very discrete */
 }
+
+/* ==========================================================================
+   INFINITE SCROLL COMPONENTS
+   ========================================================================== */
+
+/* Loading indicator */
+.infinite-scroll-loader {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-xl);
+  margin-block: var(--space-l);
+}
+
+.loader-content {
+  font-family: var(--font-mono);
+  font-size: var(--step-0);
+  color: var(--color-brand-1);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.loader-dots {
+  display: inline-flex;
+  gap: 0.2rem;
+}
+
+.loader-dots .dot {
+  animation: blink-dot 1.4s infinite;
+  opacity: 0.3;
+}
+
+.loader-dots .dot:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loader-dots .dot:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.loader-dots .dot:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes blink-dot {
+  0%, 100% {
+    opacity: 0.3;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* End message */
+.infinite-scroll-end {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-xl);
+  margin-block: var(--space-l);
+  border-top: 1px dashed var(--border-color);
+  border-bottom: 1px dashed var(--border-color);
+}
+
+.end-content {
+  font-family: var(--font-mono);
+  font-size: var(--step-0);
+  color: var(--color-text-dim);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.end-bracket {
+  color: var(--color-brand-1);
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.end-text {
+  color: var(--color-text-2);
+}
+
+/* Error message */
+.infinite-scroll-error {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--space-xl);
+  margin-block: var(--space-l);
+  border: 1px solid rgba(255, 138, 101, 0.3);
+  background: rgba(255, 138, 101, 0.05);
+}
+
+.error-content {
+  font-family: var(--font-mono);
+  font-size: var(--step-0);
+  color: var(--color-accent);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.error-bracket {
+  color: var(--color-accent);
+  font-size: 1.2em;
+  font-weight: bold;
+}
+
+.error-text {
+  color: var(--color-accent);
+}
+
+/* Card entrance animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

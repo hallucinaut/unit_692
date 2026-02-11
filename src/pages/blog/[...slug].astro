@@ -58,9 +58,19 @@ const { Content } = await render(post);
 			</div>
 		</div>
 	</article>
+
+  <!-- Infinite scroll section -->
+  <section class="infinite-scroll-section wrapper">
+    <h2 class="section-title">
+      <span class="prefix">>></span> AUTRES_JOURNAUX
+    </h2>
+    <div class="grid-layout"></div>
+  </section>
 </BaseLayout>
 
 <script>
+  import { InfiniteScrollManager } from '../../utils/infinite-scroll.js';
+
   // Ajouter un bouton copier à chaque bloc de code
   document.addEventListener('DOMContentLoaded', () => {
     const codeBlocks = document.querySelectorAll('.post-content pre');
@@ -109,7 +119,30 @@ const { Content } = await render(post);
         }
       });
     });
+
+    // Initialize infinite scroll for blog posts
+    initBlogInfiniteScroll();
   });
+
+  // Reinitialize on view transitions
+  document.addEventListener('astro:page-load', () => {
+    initBlogInfiniteScroll();
+  });
+
+  function initBlogInfiniteScroll() {
+    const container = document.querySelector('.infinite-scroll-section .grid-layout');
+    if (!container) return; // Not on a blog post page
+
+    const currentPath = window.location.pathname;
+    const currentId = currentPath.replace('/blog/', '').replace(/\//g, '');
+
+    new InfiniteScrollManager({
+      apiEndpoint: '/api/blog.json',
+      contentType: 'blog',
+      containerSelector: '.infinite-scroll-section .grid-layout',
+      initialIds: [currentId]
+    });
+  }
 </script>
 
 <style>
@@ -369,5 +402,31 @@ const { Content } = await render(post);
       font-size: 0.65rem;
       padding: 0.25rem 0.5rem;
     }
+  }
+
+  /* Infinite scroll section */
+  .infinite-scroll-section {
+    margin-block: var(--space-2xl);
+    padding-block: var(--space-xl);
+    border-top: 1px solid var(--border-color);
+  }
+
+  .section-title {
+    font-size: var(--step-2);
+    font-family: var(--font-mono);
+    color: var(--color-brand-1);
+    margin-bottom: var(--space-l);
+    text-transform: uppercase;
+  }
+
+  .section-title .prefix {
+    color: var(--color-accent);
+    margin-right: 0.5rem;
+  }
+
+  .infinite-scroll-section .grid-layout {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
+    gap: var(--space-m);
   }
 </style>

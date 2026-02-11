@@ -25,7 +25,7 @@ const description = 'Flux historique des transmissions techniques et des registr
   </section>
 
 	<section class="archive-grid wrapper">
-    <div class="grid-layout">
+    <div class="grid-layout blog-listing-grid">
   		{posts.map((post) => (
   			<BlogCard post={post} />
   		))}
@@ -90,3 +90,27 @@ const description = 'Flux historique des transmissions techniques et des registr
     gap: var(--space-m);
   }
 </style>
+
+<script>
+  import { InfiniteScrollManager } from '../utils/infinite-scroll.js';
+
+  function initInfiniteScroll() {
+    // Only initialize if we're on the blog listing page
+    const container = document.querySelector('.blog-listing-grid');
+    if (!container) return;
+
+    // On blog listing page, load SKILLS for cross-content discovery
+    new InfiniteScrollManager({
+      apiEndpoint: '/api/skills.json',
+      contentType: 'skill',
+      containerSelector: '.blog-listing-grid',
+      initialIds: [] // No skills shown yet, so empty
+    });
+  }
+
+  // Initialize on page load
+  document.addEventListener('DOMContentLoaded', initInfiniteScroll);
+
+  // Reinitialize on view transitions
+  document.addEventListener('astro:page-load', initInfiniteScroll);
+</script>

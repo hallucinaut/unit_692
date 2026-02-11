@@ -2,8 +2,9 @@
 import { getCollection } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import BlogCard from '../components/ui/BlogCard.astro';
+import SkillCard from '../components/ui/SkillCard.astro';
 
-// Fetch and Sort
+// Fetch and Sort Blog Posts
 const allPosts = await getCollection('blog', ({ data }) => {
   return data.date <= new Date();
 });
@@ -11,6 +12,10 @@ const allPosts = await getCollection('blog', ({ data }) => {
 const sortedPosts = allPosts.sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
 const featuredPost = sortedPosts[0];
 const recentPosts = sortedPosts.slice(1, 4);
+
+// Fetch Last 3 Skills
+const allSkills = await getCollection('skills');
+const recentSkills = allSkills.slice(0, 3);
 ---
 
 <BaseLayout 
@@ -200,10 +205,25 @@ const recentPosts = sortedPosts.slice(1, 4);
       </h2>
       <a href="/blog" class="view-all">[VOIR_ARCHIVES] &rarr;</a>
     </div>
-    
+
     <div class="grid-layout">
       {recentPosts.map(post => (
         <BlogCard post={post} />
+      ))}
+    </div>
+  </section>
+
+  <section class="skills-section wrapper">
+    <div class="section-header">
+      <h2 class="section-title">
+        <span class="icon">🔧</span> MODULES_ACTIFS
+      </h2>
+      <a href="/skills" class="view-all">[VOIR_MODULES] &rarr;</a>
+    </div>
+
+    <div class="grid-layout">
+      {recentSkills.map(skill => (
+        <SkillCard skill={skill} />
       ))}
     </div>
   </section>
@@ -322,6 +342,10 @@ const recentPosts = sortedPosts.slice(1, 4);
   }
 
   .recent-section {
+    margin-block-end: var(--space-xl);
+  }
+
+  .skills-section {
     margin-block-end: var(--space-2xl);
   }
 
