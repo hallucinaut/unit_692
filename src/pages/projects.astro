@@ -1,0 +1,417 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+
+const title = 'Projets Open Source';
+const description = 'Collection de projets open-source développés par UNIT_692. DevOps, IA, sécurité, et outils de développement.';
+
+// Fetch repos from GitHub API at build time
+let repos = [];
+try {
+  const response = await fetch('https://api.github.com/users/hallucinaut/repos?per_page=100&sort=pushed', {
+    headers: {
+      'Accept': 'application/vnd.github.v3+json',
+      'User-Agent': 'UNIT_692-Website'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`GitHub API error: ${response.status}`);
+  }
+
+  const allRepos = await response.json();
+
+  // Filter: only non-archived, non-fork repos with descriptions
+  repos = allRepos.filter(repo =>
+    !repo.archived &&
+    !repo.fork &&
+    repo.description &&
+    repo.description.trim() !== ''
+  ).map(repo => ({
+    name: repo.name,
+    description: repo.description,
+    url: repo.html_url,
+    homepageUrl: repo.homepage || null,
+    stargazerCount: repo.stargazers_count,
+    repositoryTopics: repo.topics ? repo.topics.map(t => ({ name: t })) : []
+  }));
+} catch (error) {
+  console.error('Failed to fetch GitHub repos:', error);
+  repos = [];
+}
+
+// Categorize repos based on topics
+function categorizeRepo(repo) {
+  const topics = repo.repositoryTopics?.map(t => t.name) || [];
+
+  if (topics.some(t => ['devops', 'docker', 'kubernetes', 'infrastructure-as-code', 'ci-cd', 'automation'].includes(t))) {
+    return 'DevOps & Infrastructure';
+  }
+  if (topics.some(t => ['machine-learning', 'deep-learning', 'neural-networks', 'ai', 'ml'].includes(t))) {
+    return 'IA & Machine Learning';
+  }
+  if (topics.some(t => ['security', 'cryptography', 'quantum-computing', 'encryption'].includes(t))) {
+    return 'Security & Cryptography';
+  }
+  if (topics.some(t => ['web-app', 'fastapi', 'webapp', 'frontend', 'backend', 'api'].includes(t))) {
+    return 'Web Development';
+  }
+  if (topics.some(t => ['code-agent', 'skills', 'cli', 'tool'].includes(t))) {
+    return 'Tools & Utilities';
+  }
+
+  return 'Other Projects';
+}
+
+// Organize repos by category
+const projects = {};
+repos.forEach(repo => {
+  const category = categorizeRepo(repo);
+  if (!projects[category]) {
+    projects[category] = [];
+  }
+
+  projects[category].push({
+    name: repo.name,
+    description: repo.description,
+    url: repo.url,
+    homepageUrl: repo.homepageUrl || null,
+    stars: repo.stargazerCount,
+    topics: repo.repositoryTopics?.map(t => t.name) || []
+  });
+});
+
+// Sort categories by priority
+const categoryOrder = [
+  'DevOps & Infrastructure',
+  'IA & Machine Learning',
+  'Security & Cryptography',
+  'Web Development',
+  'Tools & Utilities',
+  'Other Projects'
+];
+
+const sortedProjects = {};
+categoryOrder.forEach(cat => {
+  if (projects[cat]) {
+    sortedProjects[cat] = projects[cat];
+  }
+});
+---
+
+<BaseLayout title={title} description={description}>
+  <div class="grid-overlay"></div>
+
+  <section class="projects-header wrapper">
+    <h1 class="page-title">
+      <span class="prefix">>></span> PROJETS_OPEN_SOURCE
+    </h1>
+    <p class="page-desc">
+      [ACCÈS_RÉPERTOIRE]... {Object.values(sortedProjects).flat().length} PROJETS DISPONIBLES.
+    </p>
+  </section>
+
+  {Object.entries(sortedProjects).map(([category, categoryProjects]) => (
+    <section class="category-section wrapper">
+      <h2 class="category-title">
+        <span class="category-icon">▸</span> {category.toUpperCase()}
+      </h2>
+
+      <div class="projects-grid">
+        {categoryProjects.map((project) => (
+          <article class="project-card hover-blink">
+            <div class="card-header">
+              <h3 class="project-name">
+                <a href={project.url} target="_blank" rel="noopener noreferrer">
+                  {project.name}
+                </a>
+              </h3>
+              {project.stars > 0 && (
+                <span class="stars">
+                  <span class="star-icon">★</span> {project.stars}
+                </span>
+              )}
+            </div>
+
+            <p class="project-description">{project.description}</p>
+
+            {project.topics && project.topics.length > 0 && (
+              <div class="topics-list">
+                {project.topics.slice(0, 5).map((topic) => (
+                  <span class="topic-tag">{topic}</span>
+                ))}
+                {project.topics.length > 5 && (
+                  <span class="topic-tag more">+{project.topics.length - 5}</span>
+                )}
+              </div>
+            )}
+
+            <div class="card-footer">
+              <a href={project.url} target="_blank" rel="noopener noreferrer" class="view-btn">
+                VOIR_SUR_GITHUB <span class="blink-target">→</span>
+              </a>
+              {project.homepageUrl && (
+                <a href={project.homepageUrl} target="_blank" rel="noopener noreferrer" class="demo-btn">
+                  DEMO
+                </a>
+              )}
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  ))}
+</BaseLayout>
+
+<style>
+  .grid-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+      linear-gradient(var(--border-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--border-color) 1px, transparent 1px);
+    background-size: 50px 50px;
+    background-position: center;
+    opacity: 0.1;
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .projects-header {
+    padding-block: var(--space-xl);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: var(--space-xl);
+  }
+
+  .page-title {
+    font-size: var(--step-3);
+    font-family: var(--font-mono);
+    color: var(--color-brand-1);
+    text-shadow: 0 0 10px rgba(88, 166, 255, 0.2);
+    margin-bottom: var(--space-s);
+  }
+
+  .prefix {
+    color: var(--color-accent);
+    margin-right: 0.5rem;
+  }
+
+  .page-desc {
+    font-family: var(--font-mono);
+    color: var(--color-text-2);
+    border-left: 2px solid var(--color-text-dim);
+    padding-left: 1rem;
+  }
+
+  .category-section {
+    margin-bottom: var(--space-2xl);
+  }
+
+  .category-title {
+    font-size: var(--step-1);
+    font-family: var(--font-mono);
+    color: var(--color-brand-2);
+    margin-bottom: var(--space-l);
+    padding-bottom: var(--space-s);
+    border-bottom: 1px dashed var(--border-color);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .category-icon {
+    color: var(--color-accent);
+    font-size: 0.8em;
+  }
+
+  .projects-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 380px), 1fr));
+    gap: var(--space-l);
+  }
+
+  .project-card {
+    background: var(--color-surface-2);
+    border: 1px solid var(--border-color);
+    padding: var(--space-l);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-m);
+    position: relative;
+    transition: all 0.3s ease;
+    min-height: 240px;
+  }
+
+  .project-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 4px;
+    height: 0;
+    background: var(--color-brand-1);
+    transition: height 0.3s ease;
+  }
+
+  .project-card:hover {
+    border-color: var(--color-brand-1);
+    box-shadow: 0 4px 20px rgba(88, 166, 255, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .project-card:hover::before {
+    height: 100%;
+  }
+
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-s);
+  }
+
+  .project-name {
+    font-size: var(--step-0);
+    font-family: var(--font-mono);
+    font-weight: 700;
+    margin: 0;
+    flex: 1;
+  }
+
+  .project-name a {
+    color: var(--color-brand-1);
+    text-decoration: none;
+    border: none;
+    transition: color 0.2s ease;
+  }
+
+  .project-name a:hover {
+    color: var(--color-brand-2);
+    background: transparent;
+  }
+
+  .stars {
+    font-family: var(--font-mono);
+    font-size: 0.85rem;
+    color: var(--color-accent);
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    white-space: nowrap;
+  }
+
+  .star-icon {
+    color: var(--color-accent);
+  }
+
+  .project-description {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: var(--color-text-2);
+    flex-grow: 1;
+    margin: 0;
+  }
+
+  .topics-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .topic-tag {
+    font-family: var(--font-mono);
+    font-size: 0.7rem;
+    padding: 0.25rem 0.5rem;
+    background: rgba(88, 166, 255, 0.1);
+    border: 1px solid rgba(88, 166, 255, 0.3);
+    color: var(--color-brand-1);
+    border-radius: 2px;
+    white-space: nowrap;
+  }
+
+  .topic-tag.more {
+    background: rgba(255, 138, 101, 0.1);
+    border-color: rgba(255, 138, 101, 0.3);
+    color: var(--color-accent);
+  }
+
+  .card-footer {
+    display: flex;
+    gap: var(--space-s);
+    margin-top: auto;
+    padding-top: var(--space-s);
+    border-top: 1px dashed var(--border-color);
+  }
+
+  .view-btn,
+  .demo-btn {
+    font-family: var(--font-mono);
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: var(--space-xs) var(--space-s);
+    border: 1px solid var(--color-brand-1);
+    color: var(--color-brand-1);
+    text-decoration: none;
+    transition: all 0.2s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+
+  .view-btn:hover,
+  .demo-btn:hover {
+    background: var(--color-brand-1);
+    color: #000;
+    box-shadow: 0 0 10px rgba(88, 166, 255, 0.3);
+  }
+
+  .demo-btn {
+    border-color: var(--color-accent);
+    color: var(--color-accent);
+  }
+
+  .demo-btn:hover {
+    background: var(--color-accent);
+    box-shadow: 0 0 10px rgba(255, 138, 101, 0.3);
+  }
+
+  /* Mobile responsive */
+  @media (max-width: 600px) {
+    .projects-header {
+      padding-block: var(--space-l);
+      margin-bottom: var(--space-l);
+    }
+
+    .page-title {
+      font-size: var(--step-2);
+    }
+
+    .category-title {
+      font-size: var(--step-0);
+    }
+
+    .projects-grid {
+      grid-template-columns: 1fr;
+      gap: var(--space-m);
+    }
+
+    .project-card {
+      padding: var(--space-m);
+      min-height: 220px;
+    }
+
+    .card-footer {
+      flex-direction: column;
+    }
+
+    .view-btn,
+    .demo-btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>
