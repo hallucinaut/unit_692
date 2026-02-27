@@ -10,31 +10,30 @@ Un secret commité dans Git vit éternellement dans l'historique. Un certificat 
 
 **Angle choisi : Défense en profondeur.** 9 outils pour couvrir les trois piliers : secrets, cryptographie et intégrité de la supply chain.
 
-## Secrets — Détecter, Rotater, Protéger
+## Secrets — Détecter, Rotater, Gérer
 
 ### secretdetector — Scanner Local de Secrets
 
-Le premier rempart. Scanner le code avant qu'il ne quitte la machine du développeur.
+Le premier rempart. Scanner le code avant qu'il ne quitte la machine.
 
 ```bash
-go install github.com/hallucinaut/secretdetector@latest
+# Scanner le répertoire courant
+secretdetector .
 
-# Scanner un projet
-secretdetector scan ./mon-projet
+# Scanner un projet spécifique
+secretdetector /path/to/project
 
-# Résultat :
-# [CRITICAL] AWS Access Key found in config/database.yml:14
-# [HIGH] Private RSA key found in deploy/keys/prod.pem
-# [MEDIUM] Generic API token pattern in src/api/client.go:87
-#
-# Suggestions de correction automatique incluses
+# Scanner un sous-dossier
+secretdetector src/
 ```
 
-**Points forts :**
-- Détection par patterns (regex) et entropie
-- Support de 50+ types de secrets (AWS, GCP, Azure, Stripe, Twilio...)
-- Suggestions de correction automatique
-- Intégration pre-commit hook
+**Détections par sévérité :**
+- **CRITICAL** : AWS Access Keys (`AKIA...`), clés privées RSA/EC
+- **WARNING** : API keys, passwords, tokens génériques
+
+**Exclusions automatiques :** `.git`, `node_modules`, `vendor`, `bin`, `*.min.js` — pas de faux positifs sur les dépendances.
+
+L'outil est simple volontairement : un chemin en argument, un rapport en sortie. Pas de configuration, pas de fichier YAML à maintenir.
 
 **GitHub :** [hallucinaut/secretdetector](https://github.com/hallucinaut/secretdetector)
 
@@ -42,28 +41,31 @@ secretdetector scan ./mon-projet
 
 ### secret-rotator — Rotation Automatisée des Secrets
 
-Détecter ne suffit pas. Il faut rotater régulièrement et automatiquement.
+Détecter ne suffit pas. Il faut rotater régulièrement et automatiquement, sans interruption de service.
 
 ```bash
-go install github.com/hallucinaut/secret-rotator@latest
+# Découverte automatique et dry-run
+./secret-rotator --discover=/path/to/configs --dry-run
 
-# Configurer la rotation
-secret-rotator configure --provider aws --region eu-west-1
+# Rotation forcée avec configuration spécifique
+./secret-rotator --config=rotation-config.json --force=true
 
-# Rotater un secret
-secret-rotator rotate --secret-id prod/database/password --zero-downtime
-
-# Rotation planifiée
-secret-rotator schedule --secret-id prod/api-key --interval 30d
+# Découverte + rotation effective
+./secret-rotator --discover=/secrets --force=true --dry-run=false
 ```
 
 **Providers supportés :**
 - AWS Secrets Manager
 - HashiCorp Vault
 - Azure Key Vault
-- GCP Secret Manager
+- Google Cloud Secret Manager
+- Credentials de bases de données
+- API keys
+- Certificats SSL/TLS
 
-**Garantie :** rotation sans interruption de service (zero-downtime) avec vérification post-rotation.
+**Politiques de rotation :** Monthly, Quarterly, Annually, Max Age, On-Demand.
+
+**Déploiement :** stratégies blue-green et rolling pour garantir le zero-downtime. Chaque rotation génère un audit trail complet en JSON.
 
 **GitHub :** [hallucinaut/secret-rotator](https://github.com/hallucinaut/secret-rotator)
 
@@ -71,24 +73,42 @@ secret-rotator schedule --secret-id prod/api-key --interval 30d
 
 ### keyvault — Gestion du Cycle de Vie des Clés
 
-Au-delà des secrets applicatifs : la gestion complète des clés cryptographiques.
+Au-delà des secrets applicatifs : la gestion complète des clés cryptographiques avec suivi d'état.
 
 ```bash
-go install github.com/hallucinaut/keyvault@latest
+# Générer une clé
+keyvault generate --algorithm rsa --key-size 2048
+keyvault generate --algorithm ed25519
 
-# Générer une paire de clés
-keyvault generate --algorithm ed25519 --name signing-key-prod
+# Lister les clés
+keyvault list
 
 # Rotater une clé
-keyvault rotate --name signing-key-prod --grace-period 24h
+keyvault rotate key-123
 
-# Lister les clés avec leur statut
-keyvault list --format table
-# NAME              | ALGORITHM | STATUS  | EXPIRES
-# signing-key-prod  | ED25519   | ACTIVE  | 2026-06-15
-# encrypt-key-v2    | AES-256   | ACTIVE  | 2026-04-01
-# signing-key-old   | RSA-4096  | RETIRED | 2026-01-30
+# Planifier une rotation automatique
+keyvault schedule key-123 --policy policy-90-days
+
+# Vérifier l'état des clés
+keyvault check
+
+# Import/Export
+keyvault import key.pem
+keyvault export key-123
+
+# Rapport complet
+keyvault report
 ```
+
+**Algorithmes supportés :** RSA, ECDSA, AES, ChaCha20, Ed25519.
+
+**États du cycle de vie :**
+
+```
+Generated → Active → Deprecated → Revoked → Destroyed
+```
+
+**Politiques de rotation :** 90 jours, 180 jours, annuelle.
 
 **GitHub :** [hallucinaut/keyvault](https://github.com/hallucinaut/keyvault)
 
@@ -101,24 +121,20 @@ keyvault list --format table
 Trouver les algorithmes obsolètes, les clés trop courtes, les implémentations vulnérables.
 
 ```bash
-go install github.com/hallucinaut/cryptoaudit@latest
+# Scanner un projet
+cryptoaudit scan ./myproject
 
-# Auditer un projet
-cryptoaudit scan ./application --format json
-
-# Résultat type :
-# [CRITICAL] MD5 hash used for password storage — src/auth/hash.go:23
-# [HIGH] RSA-1024 key length insufficient — config/tls.yaml:8
-# [MEDIUM] CBC mode without HMAC — src/crypto/encrypt.go:45
-# [INFO] SHA-1 used for non-security purpose — src/cache/key.go:12
+# Vérifier un fichier de configuration
+cryptoaudit check config.yaml
 ```
 
-**Ce qui est détecté :**
-- Algorithmes de hash faibles (MD5, SHA-1 pour la sécurité)
-- Clés RSA < 2048 bits
-- Modes de chiffrement vulnérables (ECB, CBC sans authentification)
-- Générateurs de nombres aléatoires non cryptographiques
-- TLS versions obsolètes
+**Faiblesses détectées :**
+- **Algorithmes cassés** : MD5, SHA-1, DES, 3DES, RC4, MD4
+- **Tailles de clé insuffisantes** : RSA < 2048, ECC < 256, AES < 128
+
+**Conformité :** NIST SP 800-131A, PCI-DSS, CIS Benchmarks.
+
+Deux commandes : `scan` pour un projet entier, `check` pour un fichier spécifique.
 
 **GitHub :** [hallucinaut/cryptoaudit](https://github.com/hallucinaut/cryptoaudit)
 
@@ -126,23 +142,26 @@ cryptoaudit scan ./application --format json
 
 ### certwatch — Monitoring SSL/TLS
 
-Un certificat expiré = un incident de production. Pas de discussion.
+Un certificat expiré = un incident de production. `certwatch` surveille les certificats avec des niveaux d'alerte clairs.
 
 ```bash
-go install github.com/hallucinaut/certwatch@latest
+# Surveiller un domaine
+certwatch example.com
 
-# Surveiller des domaines
-certwatch watch agent.692.fr api.example.com --alert-before 30d
-
-# Rapport de tous les certificats
-certwatch report --format table
-# DOMAIN          | ISSUER       | EXPIRES    | DAYS LEFT | STATUS
-# agent.692.fr    | Let's Encrypt| 2026-05-15 | 77        | OK
-# api.example.com | DigiCert     | 2026-03-10 | 11        | WARNING
-
-# Intégration ACME pour renouvellement automatique
-certwatch renew --domain agent.692.fr --acme letsencrypt
+# Surveiller plusieurs domaines
+certwatch example.com api.example.com mail.example.com
 ```
+
+**Niveaux de statut :**
+
+| Statut | Condition |
+|--------|-----------|
+| **OK** | > 30 jours avant expiration |
+| **EXPIRING_SOON** | 7-30 jours |
+| **CRITICAL** | < 7 jours |
+| **EXPIRED** | Expiré |
+
+Simple : des domaines en arguments, un tableau de statut en sortie. Idéal pour un cron ou un pipeline CI.
 
 **GitHub :** [hallucinaut/certwatch](https://github.com/hallucinaut/certwatch)
 
@@ -150,23 +169,28 @@ certwatch renew --domain agent.692.fr --acme letsencrypt
 
 ### quantumsec — Préparation Post-Quantique
 
-Les ordinateurs quantiques ne sont pas encore là. Mais la migration cryptographique prend des années. Le moment de commencer, c'est maintenant.
+Les ordinateurs quantiques ne sont pas encore là. Mais la migration cryptographique prend des années.
 
 ```bash
-go install github.com/hallucinaut/quantumsec@latest
+# Évaluer des algorithmes
+quantumsec assess "RSA-2048,AES-256,SHA-256"
 
-# Évaluer la vulnérabilité quantique d'un projet
-quantumsec assess ./infrastructure --format json
+# Analyser les vulnérabilités quantiques
+quantumsec analyze "RSA-2048,ECC-256"
 
-# Plan de migration
-quantumsec migrate --plan --target post-quantum
+# Vérifier un algorithme spécifique
+quantumsec check RSA-4096
 
-# Résultat :
-# [HIGH] RSA-2048 signatures — vulnerable to Shor's algorithm
-# [HIGH] ECDSA P-256 — vulnerable to quantum attack
-# [OK] AES-256 — quantum resistant (Grover: 128-bit effective)
-# Migration plan: 14 files to update, estimated effort: MEDIUM
+# Timeline de la menace quantique
+quantumsec timeline
 ```
+
+**Analyse :**
+- **Vulnérable à Shor** : RSA (toutes tailles), ECC — cassés par l'algorithme de Shor
+- **Résistant à Grover** : AES-256 (sécurité effective 128 bits), SHA3
+- **Quantum-safe** : Kyber, Dilithium — algorithmes post-quantiques NIST
+
+La commande `timeline` donne une projection de la menace quantique et aide à prioriser la migration.
 
 **GitHub :** [hallucinaut/quantumsec](https://github.com/hallucinaut/quantumsec)
 
@@ -174,28 +198,31 @@ quantumsec migrate --plan --target post-quantum
 
 ## Supply Chain — Traçabilité et Intégrité
 
-### supply-chain-shield — Sécurité Complète de la Supply Chain
+### supply-chain-shield — Sécurité de la Supply Chain Logicielle
 
-L'outil le plus complet de l'arsenal pour la supply chain logicielle.
+L'outil le plus complet de l'arsenal pour la supply chain. Découverte automatique d'artefacts, vérification de signatures, génération de SBOM.
 
 ```bash
-go install github.com/hallucinaut/supply-chain-shield@latest
+# Découverte et analyse d'artefacts
+./supply-chain-shield --discover=./artifacts
 
-# Vérifier la provenance des artefacts
-supply-chain-shield verify --artifact ./build/app --signature ./build/app.sig
+# Avec échec sur vulnérabilités hautes
+./supply-chain-shield --discover=./artifacts --fail-high=true
 
-# Scanner les vulnérabilités des dépendances
-supply-chain-shield scan --dir ./project
+# Avec échec sur vulnérabilités critiques uniquement
+./supply-chain-shield --discover=./dist --fail-critical=true
 
-# Générer et vérifier les attestations de build
-supply-chain-shield attest --builder github-actions --output ./attestation.json
+# Mode verbose avec dry-run
+./supply-chain-shield --discover=./dist --verbose --dry-run
 ```
 
-**Fonctionnalités :**
-- Vérification de signatures d'artefacts
-- Scanning de vulnérabilités dans les dépendances
-- Gestion des SBOM
-- Attestations de build (SLSA compatible)
+**Types d'artefacts :** containers, packages, binaires, fichiers de configuration, certificats.
+
+**Capacités :**
+- Vérification de signatures RSA/ECDSA
+- Hashing SHA-256/SHA-512
+- Provenance in-toto/SLSA
+- SBOM SPDX/CycloneDX
 
 **GitHub :** [hallucinaut/supply-chain-shield](https://github.com/hallucinaut/supply-chain-shield)
 
@@ -203,17 +230,23 @@ supply-chain-shield attest --builder github-actions --output ./attestation.json
 
 ### codeprovenance — Traçabilité du Code Source
 
-D'où vient ce code ? Qui l'a modifié ? Le build est-il intègre ?
+D'où vient ce code ? Le build est-il intègre ? Quelqu'un a-t-il modifié l'artefact après le build ?
 
 ```bash
-go install github.com/hallucinaut/codeprovenance@latest
+# Enregistrer un artefact
+codeprovenance track myapp
 
-# Tracer l'origine du code
-codeprovenance trace --repo . --output provenance.json
+# Vérifier l'intégrité d'un build
+codeprovenance verify build-001
 
-# Vérifier l'intégrité du build
-codeprovenance verify --build-log ./build.log --expected-hash sha256:abc123...
+# Afficher la chaîne de provenance
+codeprovenance chain build-001
+
+# Vérifier un fichier d'information de build
+codeprovenance check build-info.json
 ```
+
+Chaque artefact est enregistré avec un hash SHA-256. La chaîne de provenance permet de retracer chaque étape du build et de détecter les modifications non autorisées. Un score d'intégrité est calculé pour chaque artefact.
 
 **GitHub :** [hallucinaut/codeprovenance](https://github.com/hallucinaut/codeprovenance)
 
@@ -221,20 +254,31 @@ codeprovenance verify --build-log ./build.log --expected-hash sha256:abc123...
 
 ### sbomgen — Génération de SBOM
 
-Le SBOM (Software Bill of Materials) est devenu une exigence réglementaire. Cet outil le génère automatiquement.
+Le SBOM (Software Bill of Materials) est devenu une exigence réglementaire. `sbomgen` le génère pour tous les écosystèmes.
 
 ```bash
-go install github.com/hallucinaut/sbomgen@latest
+# Générer un SBOM (format table par défaut)
+sbomgen gen ./myproject
 
-# Générer un SBOM
-sbomgen generate --dir ./project --format spdx-json --output sbom.json
+# Format JSON
+sbomgen gen -o sbom.json -f json ./myproject
 
-# Formats supportés : SPDX, CycloneDX
-sbomgen generate --dir ./project --format cyclonedx --output sbom.xml
+# Format Markdown
+sbomgen gen --format markdown --dir ./myapp -o sbom.md
 
-# Analyser un SBOM existant
-sbomgen analyze --input sbom.json --check-vulnerabilities
+# Formats standards
+sbomgen gen -f cyclonedx ./myproject
+sbomgen gen -f spdx ./myproject
+
+# Analyser les dépendances
+sbomgen analyze ./myproject
 ```
+
+**Formats de sortie :** SPDX, CycloneDX, JSON, YAML, Markdown, Table.
+
+**Écosystèmes détectés :** npm (package.json), PyPI (requirements.txt), Go (go.mod), Cargo (Cargo.toml), Maven (pom.xml).
+
+Chaque dépendance inclut son Package URL (pURL) pour une identification universelle.
 
 **GitHub :** [hallucinaut/sbomgen](https://github.com/hallucinaut/sbomgen)
 
@@ -246,14 +290,14 @@ Ces 9 outils s'assemblent dans un pipeline cohérent :
 
 ```
 Code → secretdetector (pre-commit)
-  → cryptoaudit (CI)
-  → sbomgen (build)
-  → codeprovenance (attestation)
-  → supply-chain-shield (vérification)
-  → certwatch (production)
-  → secret-rotator (opérationnel)
-  → keyvault (gestion)
-  → quantumsec (stratégie)
+  → cryptoaudit scan (CI)
+  → sbomgen gen (build)
+  → codeprovenance track (attestation)
+  → supply-chain-shield --discover (vérification)
+  → certwatch (monitoring production)
+  → secret-rotator --discover (rotation opérationnelle)
+  → keyvault check (gestion des clés)
+  → quantumsec assess (stratégie long terme)
 ```
 
 ## Contribuer

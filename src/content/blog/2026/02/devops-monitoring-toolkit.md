@@ -12,33 +12,30 @@ Le DevOps au quotidien, c'est du diagnostic, de la comparaison, du monitoring et
 
 ## Diagnostic & Réseau
 
-### portmap — Mapping Interactif des Ports
+### portmap — Mapping des Ports
 
-Qui écoute sur quel port ? Quel processus utilise le port 8080 ?
+Qui écoute sur quel port ? Quel processus utilise le port 8080 ? `portmap` répond en une commande avec une sortie colorée.
 
 ```bash
-go install github.com/hallucinaut/portmap@latest
-
 # Mapper tous les ports en écoute
 portmap
 
-# Résultat coloré :
-# PORT   │ PROTO │ PID   │ PROCESS        │ COMMAND
-# 22     │ TCP   │ 1234  │ sshd           │ /usr/sbin/sshd -D
-# 80     │ TCP   │ 5678  │ nginx          │ nginx: master process
-# 443    │ TCP   │ 5678  │ nginx          │ nginx: master process
-# 3000   │ TCP   │ 9012  │ node           │ node server.js
-# 5432   │ TCP   │ 3456  │ postgres       │ /usr/lib/postgresql/16/bin/postgres
-# 8080   │ TCP   │ 7890  │ java           │ java -jar api.jar
+# Filtrer un port spécifique
+portmap | grep 8080
 
-# Filtrer par port
-portmap --port 8080
-
-# Format JSON pour scripting
-portmap --format json
+# PORT   │ PROTO │ PID   │ PROCESS   │ COMMAND
+# 22     │ TCP   │ 1234  │ sshd      │ /usr/sbin/sshd -D       (rouge)
+# 443    │ TCP   │ 5678  │ nginx     │ nginx: master process   (rouge)
+# 3000   │ TCP   │ 9012  │ node      │ node server.js          (jaune)
+# 8080   │ TCP   │ 7890  │ java      │ java -jar api.jar       (vert)
 ```
 
-Plus rapide et plus lisible que `ss -tlnp | grep ...`. Un seul binaire, zéro dépendance.
+**Code couleur :**
+- **Rouge** : ports well-known (< 1024)
+- **Jaune** : ports registered (1024-7999)
+- **Vert** : ports dynamiques (8000+)
+
+Utilise `ss` (iproute2), `lsof` et `ps` en interne. Plus lisible que `ss -tlnp | grep ...` et aucune dépendance à installer.
 
 **GitHub :** [hallucinaut/portmap](https://github.com/hallucinaut/portmap)
 
@@ -49,24 +46,17 @@ Plus rapide et plus lisible que `ss -tlnp | grep ...`. Un seul binaire, zéro d�
 Vérifier la connectivité vers toutes les APIs dont dépend un service, en une commande.
 
 ```bash
-go install github.com/hallucinaut/apiconnector@latest
+# Tester un endpoint HTTP
+apiconnector api=http://localhost:8080/health
 
-# Tester la connectivité
-apiconnector test --config ./api-endpoints.yaml
+# Tester plusieurs services
+apiconnector api=http://localhost:8080/health db=postgres://localhost:5432
 
-# Résultat :
-# ENDPOINT                        │ PROTO │ STATUS │ LATENCY │ TLS
-# https://api.stripe.com          │ HTTPS │ ✓ 200  │ 45ms    │ TLS 1.3
-# https://api.sendgrid.com        │ HTTPS │ ✓ 200  │ 67ms    │ TLS 1.3
-# tcp://redis.internal:6379       │ TCP   │ ✓ OK   │ 2ms     │ N/A
-# unix:///var/run/docker.sock     │ UNIX  │ ✓ OK   │ <1ms    │ N/A
-# https://api.broken.example.com  │ HTTPS │ ✗ TIMEOUT│ >5000ms │ N/A
-
-# Matrice de connectivité entre environnements
-apiconnector matrix --envs dev,staging,prod
+# Tester avec méthode HTTP spécifique
+apiconnector api=http://localhost:8080/health web=http://localhost:3000[GET]
 ```
 
-**Protocoles supportés :** HTTP/HTTPS, TCP, Unix socket, gRPC.
+**Format d'entrée :** `nom=url` — chaque service est identifié par un nom et son URL. Support HTTP/HTTPS et connectivité TCP (PostgreSQL, Redis, etc.).
 
 **GitHub :** [hallucinaut/apiconnector](https://github.com/hallucinaut/apiconnector)
 
@@ -74,28 +64,20 @@ apiconnector matrix --envs dev,staging,prod
 
 ### healthcheckd — Agrégateur de Health Checks
 
-Un dashboard unifié de l'état de santé de tous les services.
+Un point unique pour connaître l'état de santé de tous les services. Avec génération automatique de dashboard Grafana.
 
 ```bash
-go install github.com/hallucinaut/healthcheckd@latest
+# Vérifier un service
+healthcheckd api=http://localhost:8080/health
 
-# Configurer et lancer
-healthcheckd serve --config ./healthchecks.yaml --port 8090
+# Vérifier plusieurs services
+healthcheckd api=http://localhost:8080/health web=http://localhost:3000
 
-# Vérification ponctuelle
-healthcheckd check --config ./healthchecks.yaml
-
-# Résultat :
-# SERVICE          │ STATUS  │ LATENCY │ LAST CHECK
-# api-gateway      │ HEALTHY │ 12ms    │ 10s ago
-# auth-service     │ HEALTHY │ 8ms     │ 10s ago
-# database-primary │ HEALTHY │ 3ms     │ 10s ago
-# cache-redis      │ DEGRADED│ 145ms   │ 10s ago  ← latence élevée
-# search-elastic   │ DOWN    │ TIMEOUT │ 10s ago  ← incident
-
-# Générer un dashboard Grafana
-healthcheckd grafana --output dashboard.json
+# Avec méthode HTTP spécifique
+healthcheckd service=http://localhost:9000/status[GET]
 ```
+
+Même syntaxe que `apiconnector` (`nom=url`), mais orienté monitoring continu plutôt que test ponctuel. La génération de dashboard Grafana permet une intégration directe dans un stack d'observabilité existant.
 
 **GitHub :** [hallucinaut/healthcheckd](https://github.com/hallucinaut/healthcheckd)
 
@@ -108,23 +90,20 @@ healthcheckd grafana --output dashboard.json
 Pourquoi ça marche en dev mais pas en prod ? Souvent, une variable d'environnement manquante.
 
 ```bash
-go install github.com/hallucinaut/envdiff@latest
-
 # Comparer dev et prod
-envdiff compare --source .env.dev --target .env.prod
+./envdiff .env.dev .env.prod
 
-# Résultat :
-# VARIABLE              │ DEV              │ PROD             │ STATUS
-# DATABASE_URL          │ localhost:5432   │ rds.aws:5432     │ DIFFERENT
-# REDIS_URL             │ localhost:6379   │ redis.aws:6379   │ DIFFERENT
-# API_KEY               │ test_key_123     │ (not set)        │ MISSING ←
-# DEBUG                 │ true             │ (not set)        │ MISSING
-# LOG_LEVEL             │ debug            │ info             │ DIFFERENT
-# NEW_FEATURE_FLAG      │ (not set)        │ true             │ ONLY IN PROD
-
-# Générer un script de synchronisation
-envdiff sync --source .env.dev --target .env.prod --output sync.sh
+# Sortie JSON pour automatisation
+./envdiff config/dev.json config/prod.json --json
 ```
+
+**Catégories de résultat :**
+- **Common** : présentes dans les deux fichiers, valeurs identiques
+- **Only in left** : présentes uniquement dans le premier fichier
+- **Only in right** : présentes uniquement dans le second
+- **Modified** : présentes dans les deux, valeurs différentes
+
+La sortie identifie immédiatement les variables manquantes ou modifiées. L'option `--json` permet d'intégrer le diff dans un pipeline CI et de générer des scripts de synchronisation.
 
 **GitHub :** [hallucinaut/envdiff](https://github.com/hallucinaut/envdiff)
 
@@ -135,55 +114,43 @@ envdiff sync --source .env.dev --target .env.prod --output sync.sh
 Au-delà du `diff` textuel : comprendre les différences sémantiques entre deux fichiers de configuration.
 
 ```bash
-go install github.com/hallucinaut/configdiff@latest
-
 # Comparer deux configs YAML
-configdiff compare config-v1.yaml config-v2.yaml
+configdiff config.dev.yaml config.prod.yaml
 
-# Résultat sémantique :
-# PATH                        │ v1           │ v2           │ TYPE
-# server.port                 │ 8080         │ 9090         │ CHANGED
-# server.tls.enabled          │ false        │ true         │ CHANGED
-# database.pool_size          │ 10           │ (removed)    │ REMOVED
-# cache.ttl                   │ (not set)    │ 3600         │ ADDED
-# logging.level               │ info         │ info         │ UNCHANGED
-
-# Formats : YAML, JSON, TOML, INI
-# Générer un script de migration
-configdiff migrate --from config-v1.yaml --to config-v2.yaml --output migrate.sh
-
-# Valider contre un schéma
-configdiff validate --config config.yaml --schema schema.json
+# Comparer du JSON
+configdiff settings.json settings.backup.json
 ```
+
+**Formats supportés :** YAML, JSON, TOML.
+
+L'outil parse les fichiers et compare les clés/valeurs sémantiquement, pas ligne par ligne. Un changement d'indentation ou de formatage ne sera pas signalé comme une différence. Seuls les ajouts, suppressions et modifications de valeurs sont rapportés. Génération de scripts de migration incluse.
 
 **GitHub :** [hallucinaut/configdiff](https://github.com/hallucinaut/configdiff)
 
 ---
 
-### servicewait — Attente Intelligente de Services
+### servicewait — Attente de Services
 
 Dans les environnements conteneurisés, les services démarrent dans un ordre imprévisible. Il faut attendre que les dépendances soient prêtes.
 
 ```bash
-go install github.com/hallucinaut/servicewait@latest
+# Attendre un service
+servicewait db:localhost:5432:tcp
 
-# Attendre que les services soient prêts
-servicewait wait --services "postgres:5432,redis:6379,elasticsearch:9200" --timeout 60s
+# Attendre un service HTTP avec health check
+servicewait api:localhost:8080:http:/health
 
-# Avec health check intelligent
-servicewait wait --service postgres:5432 --check "pg_isready" --interval 2s
-
-# Graphe de dépendances
-servicewait graph --config ./dependencies.yaml --output startup.sh
-
-# Résultat :
-# [WAIT] postgres:5432 ... ready (2.3s)
-# [WAIT] redis:6379 ... ready (0.8s)
-# [WAIT] elasticsearch:9200 ... ready (12.4s)
-# [OK] All services ready. Total wait: 12.4s
+# Attendre plusieurs services
+servicewait db:localhost:5432:tcp redis:localhost:6379:tcp api:localhost:8080:http:/ready
 ```
 
-Remplace les scripts `while ! nc -z ...` par quelque chose de fiable.
+**Format :** `nom:host:port:protocole` — chaque service est décrit en une seule chaîne.
+
+**Protocoles :** TCP, HTTP/HTTPS, Unix socket.
+
+**Comportement :** timeout de 5s par check, 30 retries maximum. Exit 0 si tous les services sont prêts, exit 1 en cas d'échec.
+
+Remplace les scripts `while ! nc -z ...` par quelque chose de fiable et lisible.
 
 **GitHub :** [hallucinaut/servicewait](https://github.com/hallucinaut/servicewait)
 
@@ -193,28 +160,47 @@ Remplace les scripts `while ! nc -z ...` par quelque chose de fiable.
 
 ### secmetrics — Métriques de Sécurité
 
-Mesurer la sécurité avec des KPIs concrets, pas des impressions.
+Mesurer la sécurité avec des KPIs concrets. Génère des rapports adaptés à l'audience : executive, technique ou markdown.
 
 ```bash
-go install github.com/hallucinaut/secmetrics@latest
-
 # Collecter les métriques
-secmetrics collect --sources vulnscan,incidents,patching
+secmetrics collect
 
-# Dashboard
-secmetrics dashboard --format json
+# Afficher les KPIs
+secmetrics kpis
 
-# Résultat :
-# SECURITY METRICS DASHBOARD — February 2026
-# ──────────────────────────────────────────
-# MTTR (Mean Time To Remediate):     4.2 hours
-# Vulnerability Backlog:             23 (3 critical)
-# Patch Compliance:                  94%
-# Security Training Completion:      87%
-# Incidents This Month:              2
-# Mean Time To Detect:               1.8 hours
-# Security Debt Score:               B+ (improving)
+# Rapport executive (pour la direction)
+secmetrics report executive
+
+# Rapport technique (pour l'équipe sécurité)
+secmetrics report technical
+
+# Rapport markdown (pour la documentation)
+secmetrics report markdown
+
+# Résumé rapide
+secmetrics summary
+
+# Santé globale
+secmetrics health
 ```
+
+**KPIs suivis :**
+- **MTTR** : Mean Time To Remediate
+- **MTTD** : Mean Time To Detect
+- **MTTC** : Mean Time To Contain
+- **Security coverage** : couverture des contrôles
+- **Patching compliance** : conformité des patchs
+- **Remediation rate** : taux de remédiation
+
+**Niveaux de santé :**
+
+| Statut | Critère |
+|--------|---------|
+| **HEALTHY** | >= 90% compliance, <= 30% risque |
+| **GOOD** | En dessous de HEALTHY mais acceptable |
+| **FAIR** | Améliorations nécessaires |
+| **POOR** | Action urgente requise |
 
 **GitHub :** [hallucinaut/secmetrics](https://github.com/hallucinaut/secmetrics)
 
@@ -222,29 +208,33 @@ secmetrics dashboard --format json
 
 ### resourcereport — Rapports d'Utilisation des Ressources
 
-Comprendre la consommation de ressources avec des projections et des tendances.
+Comprendre la consommation de ressources des conteneurs Docker avec plusieurs formats de sortie.
 
 ```bash
-go install github.com/hallucinaut/resourcereport@latest
-
-# Générer un rapport
-resourcereport generate --format html --output report.html
+# Rapport texte (défaut)
+resourcereport
 
 # Rapport JSON pour automatisation
-resourcereport generate --format json --period 30d
+resourcereport --json
 
-# Résultat :
-# RESOURCE USAGE REPORT — Last 30 Days
-# CPU:    avg 42% | peak 89% | trend: +5%/month
-# Memory: avg 6.2GB/16GB | peak 12.1GB | trend: +8%/month
-# Disk:   used 234GB/500GB | growth: 12GB/month
-# Network: avg 450Mbps | peak 1.2Gbps
-#
-# COST PROJECTION (next 90 days):
-# Current: $1,240/month
-# Projected: $1,380/month (+11%)
-# Recommendation: Consider scaling disk before April
+# Rapport HTML
+resourcereport --html > report.html
+
+# Filtrer par conteneur
+resourcereport api worker
 ```
+
+**Métriques collectées :** CPU, mémoire, réseau — directement depuis les conteneurs Docker.
+
+**Niveaux de statut :**
+
+| Statut | CPU |
+|--------|-----|
+| **LOW** | < 50% |
+| **NORMAL** | 50-80% |
+| **HIGH** | > 80% |
+
+3 formats de sortie (texte, JSON, HTML) pour s'adapter à tous les contextes : monitoring humain, pipeline CI ou dashboard web.
 
 **GitHub :** [hallucinaut/resourcereport](https://github.com/hallucinaut/resourcereport)
 
@@ -252,30 +242,23 @@ resourcereport generate --format json --period 30d
 
 ### logpattern — Détection de Patterns dans les Logs
 
-Trouver les patterns récurrents et les anomalies dans des millions de lignes de logs.
+Trouver les patterns récurrents dans des millions de lignes de logs. `logpattern` normalise automatiquement les contenus variables pour regrouper les messages similaires.
 
 ```bash
-go install github.com/hallucinaut/logpattern@latest
+# Analyser un fichier de logs
+logpattern /var/log/app.log
 
-# Analyser des logs
-logpattern analyze --input /var/log/syslog --format json
-
-# Résultat :
-# LOG PATTERN ANALYSIS
-# Pattern 1: "Connection refused to *:5432" — 847 occurrences (23%)
-#   → First: 2026-02-27 03:14:00 | Last: 2026-02-27 06:45:00
-#   → ANOMALY: 500% increase vs baseline
-#
-# Pattern 2: "Authentication failed for user *" — 234 occurrences (6%)
-#   → Concentrated from single IP: 10.0.3.45
-#   → ALERT: Possible brute force
-#
-# Pattern 3: "Request timeout after 30s" — 156 occurrences (4%)
-#   → Correlated with Pattern 1 (database connectivity)
-
-# Générer des règles d'alerte
-logpattern rules --input /var/log/syslog --output alertmanager-rules.yaml
+# Lire depuis stdin
+cat app.log | logpattern -
 ```
+
+**Normalisation automatique :**
+- Nombres → `<NUM>`
+- UUIDs → `<UUID>`
+- Adresses IP → `<IP>`
+- Timestamps → `<TIMESTAMP>`
+
+L'outil transforme `"Connection refused to 10.0.3.45:5432"` et `"Connection refused to 10.0.3.46:5432"` en un seul pattern : `"Connection refused to <IP>:<NUM>"`. Les patterns récurrents sont comptés et triés par fréquence.
 
 **GitHub :** [hallucinaut/logpattern](https://github.com/hallucinaut/logpattern)
 
@@ -285,28 +268,25 @@ logpattern rules --input /var/log/syslog --output alertmanager-rules.yaml
 
 ### backuptest — Validation de Sauvegardes
 
-Un backup qui n'a jamais été testé n'est pas un backup. C'est un fichier.
+Un backup qui n'a jamais été testé n'est pas un backup.
 
 ```bash
-go install github.com/hallucinaut/backuptest@latest
+# Valider un fichier de backup
+backuptest /backup/daily/database.sql
 
-# Valider l'intégrité d'un backup
-backuptest verify --backup ./backups/db-2026-02-27.sql.gz
-
-# Simuler une restauration
-backuptest restore-test --backup ./backups/db-latest.gz --target test-db
-
-# Résultat :
-# BACKUP INTEGRITY TEST
-# File: db-2026-02-27.sql.gz
-# Size: 2.4 GB
-# Checksum: SHA256 OK ✓
-# Decompression: OK ✓
-# SQL Syntax: OK ✓
-# Restore Simulation: OK ✓ (completed in 4m23s)
-# Record Count: 2,847,392 rows across 45 tables
-# Status: VERIFIED
+# Valider tous les backups d'un répertoire
+backuptest /backup/daily
 ```
+
+**Validation par checksum MD5.** Statuts :
+
+| Statut | Condition |
+|--------|-----------|
+| **OK** | Checksum valide, fichier lisible |
+| **WARNING** | Fichier vide |
+| **ERROR** | Fichier illisible ou corrompu |
+
+Simple : un chemin en argument (fichier ou répertoire), un statut en sortie.
 
 **GitHub :** [hallucinaut/backuptest](https://github.com/hallucinaut/backuptest)
 
@@ -317,24 +297,26 @@ backuptest restore-test --backup ./backups/db-latest.gz --target test-db
 Migrer un poste de travail entre Linux, macOS et Windows sans perdre sa configuration.
 
 ```bash
-go install github.com/hallucinaut/profilesync@latest
+# Preview de la migration
+./profilesync --source=linux --dest=macos --dry-run
 
-# Exporter le profil actuel
-profilesync export --output ./my-profile.tar.gz
+# Migration effective
+./profilesync --source=linux --dest=macos --dry-run=false
 
-# Éléments exportés :
-# [OK] Shell config (.bashrc, .zshrc)
-# [OK] Git config (.gitconfig, .gitignore_global)
-# [OK] SSH keys and config
-# [OK] IDE settings (VSCode, JetBrains)
-# [OK] Terminal profiles (iTerm2, Windows Terminal)
-# [OK] Browser bookmarks
-#
-# Profile exported: 45 MB
-
-# Importer sur une nouvelle machine
-profilesync import --input ./my-profile.tar.gz --merge
+# Migration forcée (écraser les fichiers existants)
+./profilesync --source=linux --dest=macos --force=true
 ```
+
+**20+ outils supportés :**
+- **Éditeurs** : VS Code, IntelliJ, Vim, Emacs
+- **Shell** : Bash, Zsh, Fish, Tmux
+- **VCS** : Git (config + gitignore global)
+- **SSH** : clés et config
+- **Navigateurs** : Chrome, Firefox
+- **Package managers** : NPM, Yarn, Pip
+- **DevOps** : Docker, kubectl, Helm, Terraform, AWS CLI
+
+Le mode `--dry-run` (par défaut) montre les fichiers qui seront migrés sans rien modifier. Essentiel pour vérifier avant d'écraser une configuration existante.
 
 **GitHub :** [hallucinaut/profilesync](https://github.com/hallucinaut/profilesync)
 
@@ -358,12 +340,12 @@ Chaque outil remplace un script bash fragile par un binaire Go testé. Chaque ou
 
 ## Contribuer
 
-Les outils DevOps sont ceux qui bénéficient le plus des contributions terrain. Chaque environnement est différent, chaque workflow a ses spécificités :
+Les outils DevOps sont ceux qui bénéficient le plus des contributions terrain :
 
-- Nouveaux providers pour `apiconnector`
 - Formats de logs pour `logpattern`
 - Providers de backup pour `backuptest`
-- Plateformes pour `profilesync`
+- Plateformes et outils pour `profilesync`
+- Protocoles pour `apiconnector` et `servicewait`
 
 ```bash
 git clone https://github.com/hallucinaut/<outil>.git

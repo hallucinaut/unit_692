@@ -14,82 +14,85 @@ La sécurité ne s'arrête pas au déploiement. C'est en production que les atta
 
 ### containerrun — Monitoring Runtime de Conteneurs
 
-Surveiller ce qui se passe à l'intérieur des conteneurs en production. Détecter les comportements anormaux.
+Surveiller ce qui se passe à l'intérieur des conteneurs en production. Moteur de règles de sécurité intégré et détection d'anomalies par baseline.
 
 ```bash
-go install github.com/hallucinaut/containerrun@latest
-
-# Monitorer les conteneurs actifs
-containerrun monitor --runtime docker
+# Monitorer un conteneur
+containerrun monitor mycontainer
 
 # Détecter les anomalies
-containerrun watch --alert-on "exec,network,filesystem"
+containerrun detect mycontainer
 
-# Résultat temps réel :
-# [ALERT] Container web-app-3: unexpected exec /bin/sh
-# [ALERT] Container web-app-3: outbound connection to 185.x.x.x:4444
-# [INFO]  Container db-1: normal filesystem I/O pattern
-# [ALERT] Container web-app-3: binary download detected /tmp/payload
+# Établir une baseline
+containerrun baseline
+
+# Vérification rapide
+containerrun check
 ```
 
-**Détections :**
-- Exécution de shell dans un conteneur
-- Connexions réseau non prévues
-- Modifications du filesystem (write dans des layers read-only)
-- Escalade de privilèges
+**Règles de sécurité pré-configurées :**
+
+| Règle | Sévérité |
+|-------|----------|
+| Privilege Escalation | CRITICAL |
+| Suspicious Exec | HIGH |
+| Network Anomaly | MEDIUM |
+| Filesystem Modification | MEDIUM |
+| Resource Abuse | LOW |
+
+**Détections :** événements de cycle de vie, exécutions de commandes, activité réseau, modifications filesystem, escalade de privilèges. L'anomaly detection analyse les déviations CPU, mémoire et réseau par rapport à la baseline.
 
 **GitHub :** [hallucinaut/containerrun](https://github.com/hallucinaut/containerrun)
 
 ---
 
-### runtimebase — Apprentissage Comportemental
+### runtimebase — Baseline Comportementale
 
-Avant de détecter les anomalies, il faut connaître le comportement normal. Cet outil apprend les baselines.
+Avant de détecter les anomalies, il faut connaître le comportement normal. `runtimebase` apprend les patterns normaux et utilise l'analyse z-score pour détecter les déviations.
 
 ```bash
-go install github.com/hallucinaut/runtimebase@latest
+# Phase d'apprentissage
+runtimebase learn myapp
 
-# Phase d'apprentissage (observer le comportement normal)
-runtimebase learn --target web-app --duration 24h
+# Phase de détection
+runtimebase detect myapp
 
-# Phase de détection (comparer au baseline)
-runtimebase detect --target web-app --baseline ./baselines/web-app.json
+# Vérification
+runtimebase check myapp
 
-# Résultat :
-# BASELINE DEVIATION REPORT — web-app
-# [ANOMALY] CPU usage 340% above baseline (normal: 15%, current: 66%)
-# [ANOMALY] New network destination: 10.0.3.45:8080 (not in baseline)
-# [ANOMALY] New process: /usr/bin/curl (not in baseline)
-# [OK] Memory usage within normal range
-# [OK] Disk I/O within normal range
+# Analyser des logs
+runtimebase analyze /var/log/myapp.log
 ```
+
+**Patterns surveillés :** syscalls, accès fichiers, activité réseau, comportement des processus.
+
+**Sévérité par z-score :**
+
+| Z-Score | Sévérité |
+|---------|----------|
+| > 5 | CRITICAL |
+| > 3 | HIGH |
+| > 2 | MEDIUM |
+
+L'approche statistique par z-score permet de détecter les déviations sans règles codées en dur — le système s'adapte au comportement réel de l'application.
 
 **GitHub :** [hallucinaut/runtimebase](https://github.com/hallucinaut/runtimebase)
 
 ---
 
-### dockerclean — Nettoyage Intelligent Docker
+### dockerclean — Nettoyage Docker
 
-Les environnements Docker accumulent des images, volumes et conteneurs orphelins. Surface d'attaque inutile et gaspillage de ressources.
+Les environnements Docker accumulent des ressources orphelines : conteneurs stoppés, volumes inutilisés, images dangling. Surface d'attaque inutile et gaspillage de ressources.
 
 ```bash
-go install github.com/hallucinaut/dockerclean@latest
+# Preview (rien n'est supprimé)
+dockerclean --dry-run
 
-# Analyser l'utilisation (preview, rien n'est supprimé)
-dockerclean analyze
-
-# Résultat :
-# DOCKER RESOURCE ANALYSIS
-# Images:     47 (12 dangling, 8 unused for > 30 days)
-# Containers: 23 (5 exited, 2 dead)
-# Volumes:    18 (6 orphaned)
-# Networks:   12 (3 unused)
-# Reclaimable space: 34.2 GB
-
-# Nettoyage sélectif avec confirmation
-dockerclean clean --older-than 30d --preview
-dockerclean clean --older-than 30d --confirm
+# Nettoyage effectif
+dockerclean
 ```
+
+Deux modes : `--dry-run` pour voir ce qui sera nettoyé, sans argument pour exécuter. Simple et prévisible.
 
 **GitHub :** [hallucinaut/dockerclean](https://github.com/hallucinaut/dockerclean)
 
@@ -97,33 +100,35 @@ dockerclean clean --older-than 30d --confirm
 
 ### k8s-policy-enforcer — Enforcement de Politiques Kubernetes
 
-L'intégration unifiée d'OPA/Gatekeeper et Kyverno pour enforcer les politiques de sécurité sur un cluster Kubernetes.
+16 politiques de sécurité intégrées pour Kubernetes, avec intégration OPA/Gatekeeper et Kyverno.
 
 ```bash
-go install github.com/hallucinaut/k8s-policy-enforcer@latest
+# Auditer des manifests
+./k8s-policy-enforcer --dir=./k8s-manifests
 
-# Appliquer les politiques de sécurité
-k8s-policy-enforcer enforce --policies ./k8s-policies/
+# Filtrer par namespace
+./k8s-policy-enforcer --dir=./k8s --namespace=production
 
-# Vérifier la conformité du cluster
-k8s-policy-enforcer audit --cluster production
-
-# Résultat :
-# KUBERNETES POLICY AUDIT — Cluster: production
-# [BLOCK] Pod nginx-test: running as root (policy: no-root-containers)
-# [BLOCK] Deployment api-v2: no resource limits (policy: require-limits)
-# [WARN]  Pod worker-3: using latest tag (policy: no-latest-tag)
-# [PASS]  All pods have readiness probes
-# [PASS]  No privileged containers found
+# Mode strict : échec sur warn et violations
+./k8s-policy-enforcer --dir=./k8s --fail-strict=true --fail-warn=true
 ```
 
-**Politiques incluses :**
-- Interdiction des conteneurs root
-- Limites de ressources obligatoires
-- Pas de tag `latest`
-- Network policies requises
-- Pas de volumes hostPath
-- SecurityContext obligatoire
+**16 Politiques intégrées :**
+
+| ID | Politique | Catégorie |
+|----|-----------|-----------|
+| K8S-SEC-001 | No Privileged Containers | Security Context |
+| K8S-SEC-002 | Run as Non-Root | Security Context |
+| K8S-SEC-003 | Read-Only Root Filesystem | Security Context |
+| K8S-SEC-004 | No Allow Privilege Escalation | Security Context |
+| K8S-NET-001 | Network Policies Required | Network |
+| K8S-NET-002 | Default Deny Ingress | Network |
+| K8S-RES-001 | Resource Limits Required | Resource |
+| K8S-POD-001 | No Host Network | Pod |
+| K8S-IMG-001 | No Latest Tag | Image |
+| K8S-SA-001 | No Default Service Account | Service Account |
+
+Et 6 autres politiques couvrant les hostPath, les capabilities Linux, les probes de readiness, etc.
 
 **GitHub :** [hallucinaut/k8s-policy-enforcer](https://github.com/hallucinaut/k8s-policy-enforcer)
 
@@ -133,27 +138,34 @@ k8s-policy-enforcer audit --cluster production
 
 ### ransomseeker — Détection de Ransomware
 
-Détecter les comportements caractéristiques d'un ransomware avant que le chiffrement des fichiers ne soit complet.
+Détecter les comportements caractéristiques d'un ransomware avant que le chiffrement des fichiers ne soit complet. Protection et récupération intégrées.
 
 ```bash
-go install github.com/hallucinaut/ransomseeker@latest
+# Détecter les comportements ransomware
+ransomseeker detect
 
-# Monitoring en temps réel
-ransomseeker watch --paths /data,/home,/var --alert webhook:https://alerts.example.com
+# Activer la protection en temps réel
+ransomseeker protect
 
-# Comportements détectés :
-# [CRITICAL] Mass file rename detected: 847 files renamed with .encrypted extension
-# [CRITICAL] Entropy spike: files in /data/documents showing encryption patterns
-# [HIGH] Shadow copy deletion attempt: vssadmin delete shadows
-# [HIGH] Rapid file modification: 200+ files/sec in /home/user/
+# Récupérer des fichiers
+ransomseeker recover
+
+# Scanner un chemin spécifique
+ransomseeker scan /path/to/scan
+
+# Rapport
+ransomseeker report
 ```
 
-**Indicateurs surveillés :**
-- Renommage massif de fichiers
-- Augmentation d'entropie des fichiers (signe de chiffrement)
-- Suppression de shadow copies / snapshots
-- Modification rapide et séquentielle de fichiers
-- Connexions à des C2 connus
+**Familles de ransomware reconnues :** WannaCry, Ryuk, LockBit, Conti, Phobos.
+
+**Méthodes de détection :**
+- Monitoring des modifications de fichiers en temps réel
+- Détection de patterns de chiffrement (augmentation d'entropie)
+- Monitoring des processus suspects
+- Analyse comportementale
+
+3 moteurs distincts : détection (`detect`), protection active (`protect`), récupération (`recover`).
 
 **GitHub :** [hallucinaut/ransomseeker](https://github.com/hallucinaut/ransomseeker)
 
@@ -161,26 +173,30 @@ ransomseeker watch --paths /data,/home,/var --alert webhook:https://alerts.examp
 
 ### sidedetect — Attaques par Canal Auxiliaire
 
-Les attaques par canal auxiliaire (side-channel) exploitent les fuites d'information via le timing, le cache CPU ou la prédiction de branchement.
+Les attaques side-channel exploitent les fuites d'information via le timing, le cache CPU ou la prédiction de branchement. `sidedetect` analyse le code source pour trouver ces vulnérabilités.
 
 ```bash
-go install github.com/hallucinaut/sidedetect@latest
+# Scanner un projet
+sidedetect scan ./myproject
 
-# Scanner pour vulnérabilités timing
-sidedetect scan --type timing --target ./crypto-service
+# Analyser un fichier spécifique
+sidedetect analyze crypto.go
 
-# Vérifier les protections cache
-sidedetect check --type cache --process crypto-service
-
-# Résultat :
-# SIDE-CHANNEL VULNERABILITY ASSESSMENT
-# [HIGH] Timing vulnerability in password comparison — src/auth/compare.go:18
-#        → String comparison is not constant-time
-# [MEDIUM] Cache timing leak possible in AES implementation
-#        → Consider using AES-NI hardware instructions
-# [LOW] Branch prediction pattern in key derivation
-#        → Conditional logic depends on secret data
+# Vérification rapide
+sidedetect check encryption.go
 ```
+
+**Vulnérabilités détectées :**
+
+| ID | Vulnérabilité | CVSS |
+|----|---------------|------|
+| TC-001 | Comparaison de password non constant-time | 7.5 |
+| TC-002 | Indexation par secret (table lookup) | 7.0 |
+| TC-003 | Branchement dépendant d'un secret | 6.5 |
+| CA-001 | Table lookup avec index secret (cache timing) | 7.8 |
+| BP-001 | Prédiction de branchement | 6.0 |
+
+**Langages supportés :** Go, C/C++, Rust, Java, Python, JavaScript.
 
 **GitHub :** [hallucinaut/sidedetect](https://github.com/hallucinaut/sidedetect)
 
@@ -188,28 +204,26 @@ sidedetect check --type cache --process crypto-service
 
 ### threatintel — Corrélation de Threat Intelligence
 
-Agréger les feeds de threat intelligence et corréler avec les événements locaux.
+Agréger les indicateurs de compromission (IOCs), vérifier la réputation et corréler les événements de sécurité.
 
 ```bash
-go install github.com/hallucinaut/threatintel@latest
+# Ajouter des indicateurs
+threatintel add ip 192.168.1.100
+threatintel add domain malicious.com
 
-# Importer des feeds
-threatintel feed add --source alienvault --api-key $OTX_KEY
-threatintel feed add --source abuseipdb --api-key $ABUSE_KEY
+# Vérifier un indicateur
+threatintel check 192.168.1.100
 
-# Vérifier une IP
-threatintel lookup --ip 185.143.223.47
+# Vérifier la réputation
+threatintel reputation 10.0.0.1
 
-# Corréler les logs avec les IOCs
-threatintel correlate --logs ./firewall.log --format json
-
-# Résultat :
-# [MATCH] IP 185.143.223.47 — Known C2 server (Cobalt Strike)
-#   Source: AlienVault OTX | Confidence: 92%
-#   First seen: 2026-01-15 | Last seen: 2026-02-26
-#   Associated malware: TrickBot, Emotet
-#   Occurrences in logs: 14 (last 24h)
+# Corréler les événements
+threatintel correlate
 ```
+
+**Types d'indicateurs :** IP, domaine, URL, hash de fichier, email, fichier, certificat, CIDR.
+
+La commande `correlate` croise tous les indicateurs enregistrés avec les événements de sécurité pour identifier les attaques coordonnées et attribuer les menaces à des acteurs connus.
 
 **GitHub :** [hallucinaut/threatintel](https://github.com/hallucinaut/threatintel)
 
@@ -217,32 +231,34 @@ threatintel correlate --logs ./firewall.log --format json
 
 ## Réponse Incident & Forensics
 
-### securityplaybook — Playbooks Automatisés
+### securityplaybook — Playbooks de Réponse à Incident
 
-Quand un incident se produit, pas le temps de chercher la procédure. Les playbooks automatisent la réponse.
+Quand un incident se produit, pas le temps de chercher la procédure. Les playbooks automatisent la réponse étape par étape.
 
 ```bash
-go install github.com/hallucinaut/securityplaybook@latest
-
 # Lister les playbooks disponibles
 securityplaybook list
-# PLAYBOOK                | TRIGGER           | SEVERITY
-# compromised-credentials | secret_exposed    | CRITICAL
-# ransomware-response     | ransomware_detect | CRITICAL
-# unauthorized-access     | auth_anomaly      | HIGH
-# data-exfiltration       | data_leak         | HIGH
 
 # Exécuter un playbook
-securityplaybook run compromised-credentials --secret-id aws-key-prod
+securityplaybook run pb-001
 
-# Actions automatisées :
-# [1/6] Revoking compromised credential...  DONE
-# [2/6] Rotating to new credential...       DONE
-# [3/6] Scanning git history for exposure... DONE
-# [4/6] Notifying security team...           DONE
-# [5/6] Creating incident ticket...          DONE
-# [6/6] Generating post-mortem template...   DONE
+# Voir les étapes d'un playbook
+securityplaybook steps pb-001
+
+# Rapport post-incident
+securityplaybook report
 ```
+
+**Playbooks pré-configurés :**
+
+| ID | Playbook | Type |
+|----|----------|------|
+| pb-001 | Malware Response | Containment + Eradication |
+| pb-002 | Data Breach Response | Investigation + Notification |
+| pb-003 | Ransomware Response | Isolation + Recovery |
+| pb-004 | Phishing Response | Analysis + Remediation |
+
+Chaque playbook contient des étapes séquentielles avec actions automatisées. La commande `steps` permet de visualiser le déroulement avant exécution.
 
 **GitHub :** [hallucinaut/securityplaybook](https://github.com/hallucinaut/securityplaybook)
 
@@ -250,45 +266,58 @@ securityplaybook run compromised-credentials --secret-id aws-key-prod
 
 ### memforens — Forensics Mémoire
 
-Quand un système est compromis, la mémoire contient les preuves que le disque n'a pas.
+Quand un système est compromis, la mémoire contient les preuves que le disque n'a pas. `memforens` extrait les secrets depuis les dumps mémoire en parsant `/proc/self/maps`.
 
 ```bash
-go install github.com/hallucinaut/memforens@latest
+# Scanner un dump mémoire
+memforens scan memory.dump
 
-# Capturer un dump mémoire
-memforens capture --pid 1234 --output ./dumps/process.mem
-
-# Analyser un dump
-memforens analyze --input ./dumps/process.mem
-
-# Résultat :
-# MEMORY FORENSICS REPORT
-# Process: nginx (PID 1234)
-# [FINDING] Injected code detected at 0x7f4a2c000000 (RWX region)
-# [FINDING] Encrypted strings decoded: "C2_SERVER=evil.example.com"
-# [FINDING] Credential in memory: "admin:$2b$12$..."
-# [FINDING] Network socket to 185.x.x.x:443 (not in expected connections)
+# Analyser en détail
+memforens analyze memory.dump
 ```
+
+**Types de secrets extraits :**
+
+| Type | Confiance |
+|------|-----------|
+| AWS Access Keys | 95% |
+| GitHub Tokens | 95% |
+| Private Keys | 100% |
+| JWT Tokens | 85% |
+| API Keys | 70% |
+| Passwords | 60% |
+
+L'outil parse la structure mémoire (`/proc/self/maps`), extrait les chaînes imprimables et les filtre par patterns connus. Les niveaux de confiance indiquent la probabilité que la détection soit un vrai positif.
 
 **GitHub :** [hallucinaut/memforens](https://github.com/hallucinaut/memforens)
 
 ---
 
-### securitytestdata — Génération de Données de Test
+### securitytestdata — Génération de Payloads de Test
 
-Pour tester les défenses, il faut des attaques réalistes. Cet outil génère des payloads de test.
+Pour tester les défenses, il faut des attaques réalistes. `securitytestdata` génère des payloads OWASP Top 10 et gère des scénarios de test complets.
 
 ```bash
-go install github.com/hallucinaut/securitytestdata@latest
+# Générer des payloads SQL injection
+securitytestdata generate sql_injection
 
 # Générer des payloads XSS
-securitytestdata generate --type xss --count 100 --output payloads.txt
+securitytestdata generate xss
 
-# Générer des scénarios d'attaque complets
-securitytestdata scenario --type sqli --target web-app --output scenario.json
+# Lister les types disponibles
+securitytestdata list
 
-# Types supportés : xss, sqli, command-injection, path-traversal, ssrf
+# Exécuter les scénarios de test
+securitytestdata run
+
+# Rapport de résultats
+securitytestdata report
+
+# Détails d'un scénario
+securitytestdata info sc-001
 ```
+
+**Types de payloads :** SQL injection, XSS, command injection, path traversal, SSRF.
 
 **GitHub :** [hallucinaut/securitytestdata](https://github.com/hallucinaut/securitytestdata)
 
@@ -296,19 +325,32 @@ securitytestdata scenario --type sqli --target web-app --output scenario.json
 
 ### smartaudit — Audit de Smart Contracts
 
-La sécurité blockchain est un domaine spécifique mais critique.
+La sécurité blockchain est un domaine spécifique mais critique. `smartaudit` détecte les vulnérabilités classiques des smart contracts.
 
 ```bash
-go install github.com/hallucinaut/smartaudit@latest
-
 # Auditer un smart contract
-smartaudit scan --contract ./contracts/Token.sol --format json
+smartaudit audit contract.sol
 
-# Vulnérabilités détectées :
-# [CRITICAL] Reentrancy vulnerability — Token.sol:45
-# [HIGH] Integer overflow possible — Token.sol:78
-# [MEDIUM] Unchecked return value — Token.sol:92
+# Analyser
+smartaudit analyze contract.sol
+
+# Vérification rapide
+smartaudit check
 ```
+
+**Vulnérabilités détectées :**
+- **Reentrancy** (CWE-863) — le classique DAO hack
+- **Integer overflow** (CWE-190)
+- **Unchecked return values** (CWE-252)
+- **Access control** (CWE-284)
+- **Timestamp dependence**
+- **Denial of Service**
+- **Delegatecall vulnerabilities**
+- **Unprotected mint**
+- **Variable shadowing**
+- **Gas limit issues**
+
+**Niveaux de risque :** MINIMAL (0-0.2), LOW (0.2-0.4), MEDIUM (0.4-0.6), HIGH (0.6-0.8), CRITICAL (0.8-1.0).
 
 **GitHub :** [hallucinaut/smartaudit](https://github.com/hallucinaut/smartaudit)
 
@@ -317,30 +359,30 @@ smartaudit scan --contract ./contracts/Token.sol --format json
 ## La Chaîne de Défense Active
 
 ```
-runtimebase (baseline)
+runtimebase learn (baseline)
     │
     ▼
-containerrun + k8s-policy-enforcer (monitoring)
+containerrun monitor + k8s-policy-enforcer (runtime)
     │
-    ├── ransomseeker (détection ransomware)
-    ├── sidedetect (canaux auxiliaires)
-    ├── threatintel (corrélation IOC)
-    │
-    ▼
-securityplaybook (réponse automatisée)
+    ├── ransomseeker detect (ransomware)
+    ├── sidedetect scan (code analysis)
+    ├── threatintel correlate (IOC matching)
     │
     ▼
-memforens (forensics post-incident)
+securityplaybook run (réponse automatisée)
+    │
+    ▼
+memforens scan (forensics post-incident)
 ```
 
 ## Contribuer
 
-La détection de menaces est un domaine en évolution constante. Contributions recherchées :
+La détection de menaces évolue avec les attaques. Contributions recherchées :
 
-- Nouveaux patterns de détection pour `ransomseeker`
+- Nouvelles signatures de ransomware pour `ransomseeker`
+- Nouveaux patterns side-channel pour `sidedetect`
 - Intégration de feeds threat intel pour `threatintel`
 - Playbooks de réponse pour `securityplaybook`
-- Analyseurs de mémoire pour `memforens`
 
 **Tous les outils :** [Arsenal Open Source Complet](/blog/2026/02/arsenal-securite-open-source/)
 
