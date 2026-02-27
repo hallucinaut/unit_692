@@ -26,6 +26,6 @@ pnpm-debug.log*
 # visual studio code
 .vscode/
 
-# synchronize hallucinaut/skills-pi
+# synchronize hallucinaut/skills
 .skills-temp
 */*/skills/*.md
